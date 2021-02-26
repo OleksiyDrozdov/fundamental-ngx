@@ -9,12 +9,27 @@ import {
     Input,
     OnDestroy,
     OnInit,
+    Output,
     ViewChild
 } from '@angular/core';
 import { FocusableOption } from '@angular/cdk/a11y';
 import { Subscription } from 'rxjs';
+import { outputNames } from '@angular/cdk/schematics';
 
 export type ResizeDirection = 'vertical' | 'horizontal' | 'both';
+
+export const HorizontalResizeStep = '20rem';
+export const verticalResizeStep = '1rem';
+
+export interface ResizableCardItemConfig {
+    title: string;
+    rank: number,
+    cardWidth: number;
+    cardHeight: number;
+    miniHeaderHeight: number;
+    miniContentHeight: number;
+    resizable: boolean
+}
 
 @Component({
     selector: 'fd-resizable-card-item',
@@ -25,6 +40,29 @@ export type ResizeDirection = 'vertical' | 'horizontal' | 'both';
 export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDestroy, FocusableOption {
     @Input()
     id: string;
+
+    @Input()
+    title: string;
+
+    @Input()
+    rank: number;
+
+    /** card width in px */
+    @Input()
+    cardWidth: number;
+
+    /** card height in px */
+    @Input()
+    cardHeight: number;
+
+    @Input()
+    miniHeaderHeight: number;
+
+    @Input()
+    miniContentHeight: number;
+
+    @Input()
+    config: any;
 
     @Input()
     forceRender = false;
@@ -40,6 +78,24 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
 
     @Input()
     resizeVertical = false;
+
+    @Output()
+    stepChange: any;
+
+    @Output()
+    resizing: any;
+
+    @Output()
+    resized: any;
+
+    @Output()
+    dropped: any;
+
+    @Output()
+    miniHeaderReached: any;
+
+    @Output()
+    miniContentReached: any;
 
     @HostBinding('style.left')
     left = 0;
@@ -67,8 +123,7 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
 
     
     showResizeIcon = true;
-    cardWidth: number;
-    cardHeight: number;
+    
     showBorder = false;
 
     private verticalHandleSub: Subscription = Subscription.EMPTY;

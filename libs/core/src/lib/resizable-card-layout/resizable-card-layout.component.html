@@ -1,5 +1,5 @@
 <div class="fd-resizable-card-layout" [ngClass]="'fd-resizable-card-layout--'+layoutSize">
-    <ng-container *ngFor="let card of cards; let i = index">
+    <ng-container *ngFor="let card of resizeCardItems; let i = index">
         <fd-resizable-card-item [forceRender]="true">
             <ng-container *ngTemplateOutlet="card?.template"> </ng-container>
         </fd-resizable-card-item>
