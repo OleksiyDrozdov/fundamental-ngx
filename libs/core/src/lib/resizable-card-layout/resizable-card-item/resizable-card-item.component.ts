@@ -1,5 +1,4 @@
 import {
-    AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
@@ -8,36 +7,37 @@ import {
     HostListener,
     Input,
     OnDestroy,
-    OnInit,
     Output,
-    ViewChild
+    ViewChild,
+    ViewEncapsulation
 } from '@angular/core';
 import { FocusableOption } from '@angular/cdk/a11y';
 import { Subscription } from 'rxjs';
-import { outputNames } from '@angular/cdk/schematics';
 
 export type ResizeDirection = 'vertical' | 'horizontal' | 'both';
 
-export const HorizontalResizeStep = '20rem';
-export const verticalResizeStep = '1rem';
+// values in pixel
+export const HorizontalResizeStep = 320;
+export const verticalResizeStep = 16;
 
 export interface ResizableCardItemConfig {
-    title: string;
-    rank: number,
-    cardWidth: number;
-    cardHeight: number;
-    miniHeaderHeight: number;
-    miniContentHeight: number;
-    resizable: boolean
+    title?: string;
+    rank?: number;
+    cardWidth?: number;
+    cardHeight?: number;
+    miniHeaderHeight?: number;
+    miniContentHeight?: number;
+    resizable?: boolean;
 }
 
 @Component({
     selector: 'fd-resizable-card-item',
     templateUrl: 'resizable-card-item.component.html',
     styleUrls: ['./resizable-card-item.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None
 })
-export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDestroy, FocusableOption {
+export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
     @Input()
     id: string;
 
@@ -47,9 +47,9 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
     @Input()
     rank: number;
 
-    /** card width in px */
+    /** card width in px. Default value to 20rem */
     @Input()
-    cardWidth: number;
+    cardWidth: number = HorizontalResizeStep;
 
     /** card height in px */
     @Input()
@@ -62,10 +62,18 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
     miniContentHeight: number;
 
     @Input()
-    config: any;
+    get config(): ResizableCardItemConfig {
+        return this._config;
+    }
+
+    set config(config: ResizableCardItemConfig) {
+        this._config = config;
+        this._initialSetup();
+        this._changeDetectorRef.detectChanges();
+    }
 
     @Input()
-    forceRender = false;
+    forceRender = true;
 
     @Input()
     resizable = true;
@@ -78,6 +86,14 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
 
     @Input()
     resizeVertical = false;
+
+    @Input()
+    @HostBinding('style.left')
+    left = '0';
+
+    @Input()
+    @HostBinding('style.top')
+    top = '0';
 
     @Output()
     stepChange: any;
@@ -97,12 +113,6 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
     @Output()
     miniContentReached: any;
 
-    @HostBinding('style.left')
-    left = 0;
-
-    @HostBinding('style.top')
-    top = 0;
-
     @HostBinding('style.z-index')
     zIndex = 0;
 
@@ -121,14 +131,14 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
     @ViewChild('resizeCard')
     cardElementRef: ElementRef;
 
-    
     showResizeIcon = true;
-    
+
     showBorder = false;
 
     private verticalHandleSub: Subscription = Subscription.EMPTY;
     private horizontalHandleSub: Subscription = Subscription.EMPTY;
 
+    private _config: ResizableCardItemConfig;
     private _prevX: number;
     private _prevY: number;
     private _resize = false;
@@ -136,13 +146,22 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
 
     constructor(private _changeDetectorRef: ChangeDetectorRef, private _elementRef: ElementRef) {}
 
-    ngOnInit(): void {}
-
-    ngAfterViewInit(): void {}
-
     ngOnDestroy(): void {
         this.verticalHandleSub.unsubscribe();
         this.horizontalHandleSub.unsubscribe();
+    }
+
+    private _initialSetup(): void {
+        console.log('item _initialSetup: ', this._config);
+        this.title = this.title || this._config.title;
+        this.rank = this.rank || this._config.rank;
+        this.cardWidth = this._config.cardWidth;
+        this.cardHeight = this._config.cardHeight;
+        this.miniHeaderHeight = this.miniHeaderHeight || this._config.miniHeaderHeight;
+        this.miniContentHeight = this.miniContentHeight || this._config.miniContentHeight;
+        this.resizable = this.resizable || this._config.resizable;
+        console.log('item _initialSetup this.cardWidth: ', this.cardWidth);
+        console.log('item _initialSetup this.cardHeight: ', this.cardHeight);
     }
 
     onMouseDown(event: MouseEvent, resizeDirection: ResizeDirection): void {
@@ -151,8 +170,6 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
         this._resize = true;
         this._prevX = event.clientX;
         this._prevY = event.clientY;
-        this.cardWidth = this.cardElementRef.nativeElement.getBoundingClientRect().width;
-        this.cardHeight = this.cardElementRef.nativeElement.getBoundingClientRect().height;
         this._resizeDirection = resizeDirection;
     }
 
@@ -180,7 +197,6 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
         this._resize = false;
         this.zIndex = 0;
         this.showBorder = false;
-        console.log('onMouseUp resizeDirection: ', resizeDirection);
     }
 
     /** Sets focus on the element */
@@ -198,5 +214,13 @@ export class ResizableCardItemComponent implements OnInit, AfterViewInit, OnDest
         // this.showResizeIcon = false;
         // this._changeDetectorRef.markForCheck();
         // this.cornerHandleSub.unsubscribe();
+    }
+
+    markForCheck(): void {
+        this._changeDetectorRef.markForCheck();
+    }
+
+    detectChanges(): void {
+        this._changeDetectorRef.detectChanges();
     }
 }

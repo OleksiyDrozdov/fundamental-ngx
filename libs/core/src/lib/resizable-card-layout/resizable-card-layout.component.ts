@@ -1,14 +1,16 @@
 import {
-    AfterContentInit,
     AfterViewInit,
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ContentChildren,
     Directive,
     Input,
+    OnInit,
     QueryList,
     TemplateRef,
-    ViewChildren
+    ViewContainerRef,
+    ViewEncapsulation
 } from '@angular/core';
 
 import { ResizableCardItemComponent } from './resizable-card-item/resizable-card-item.component';
@@ -20,48 +22,48 @@ export type LayoutSize = 'sm' | 'md' | 'lg';
 export type ResizableCardLayoutConfig = Array<ResizableCardItemConfig>;
 
 @Directive({ selector: '[fdRsCardDef]' })
-export class ResizableCardDefinitionDirective {
+export class ResizableCardDefinitionDirective implements OnInit {
     /**
      * Behaves like rank of card.
      * Useful in creating layout again after drag&drop or resize.
      */
     @Input()
-    fdCardDef: number = cardRank++;
+    fdRsCardDef: number = cardRank++;
 
-    constructor(public template: TemplateRef<any>) {}
+    constructor(public template: TemplateRef<any>, public container: ViewContainerRef) {}
+
+    ngOnInit(): void {
+        this.container.createEmbeddedView(this.template);
+    }
 }
 
 @Component({
     selector: 'fd-resizable-card-layout',
     templateUrl: 'resizable-card-layout.component.html',
     styleUrls: ['./resizable-card-layout.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None
 })
-export class ResizableCardLayoutComponent implements AfterViewInit, AfterContentInit {
+export class ResizableCardLayoutComponent implements AfterViewInit {
     @Input()
     draggable = true;
 
     @Input()
     layoutConfig: ResizableCardLayoutConfig;
 
-    @ViewChildren(ResizableCardItemComponent)
+    @ContentChildren(ResizableCardItemComponent)
     resizeCardItems: QueryList<ResizableCardItemComponent>;
-
-    /** @hidden */
-    @ContentChildren(ResizableCardDefinitionDirective)
-    resizeCards: QueryList<ResizableCardDefinitionDirective>;
 
     public layoutSize: LayoutSize = 'md';
 
-    /** @hidden */
-    ngAfterContentInit(): void {
-        console.log('ngAfterContentInit resizeCardItems: ', this.resizeCardItems);
-        console.log('ngAfterContentInit resizeCards: ', this.resizeCards);
-    }
+    constructor(private _changeDetectorRef: ChangeDetectorRef) {}
 
     /** @hidden */
     ngAfterViewInit(): void {
-        console.log('ngAfterViewInit resizeCardItems: ', this.resizeCardItems);
-        console.log('ngAfterViewInit resizeCards: ', this.resizeCards);
+        this.resizeCardItems.forEach((card, i) => {
+            card.config = this.layoutConfig[i];
+            card.detectChanges();
+        });
+        this._changeDetectorRef.markForCheck();
     }
 }
