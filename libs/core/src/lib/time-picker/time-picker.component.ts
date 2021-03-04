@@ -65,6 +65,10 @@ export class TimePickerComponent<D> implements ControlValueAccessor, OnInit, Aft
     @Input()
     time: D;
 
+    /** Id attribute for input element inside TimePicker component */
+    @Input()
+    inputId = '';
+
     /** @Input Uses compact time picker. */
     @Input()
     compact: boolean = null;
