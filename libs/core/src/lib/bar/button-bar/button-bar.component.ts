@@ -64,7 +64,7 @@ export class ButtonBarComponent extends BaseButton implements OnInit, OnDestroy 
 
     /** @hidden */
     ngOnInit(): void {
-        if (this.compact === null) {
+        if (this.compact === null && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
                 this._cdRef.detectChanges();

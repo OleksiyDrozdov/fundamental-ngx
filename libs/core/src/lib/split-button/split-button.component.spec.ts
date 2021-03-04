@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MenuModule } from '../menu/menu.module';
 import createSpy = jasmine.createSpy;
+import { ContentDensityService } from '../utils/public_api';
 
 @Component({
     selector: 'fd-test-component',
@@ -34,7 +35,8 @@ describe('SplitButtonComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             imports: [MenuModule],
-            declarations: [SplitButtonComponent, TestComponent]
+            declarations: [SplitButtonComponent, TestComponent],
+            providers: [ContentDensityService]
         });
     }));
 
@@ -50,6 +52,11 @@ describe('SplitButtonComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
         expect(componentInstance).toBeTruthy();
+    });
+
+    it('should handle content density when compact input is not provided', () => {
+        componentInstance.ngOnInit();
+        expect(componentInstance.compact).toBeFalse();
     });
 
     it('should handle content init - no selected item', () => {

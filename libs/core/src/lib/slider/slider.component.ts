@@ -171,9 +171,6 @@ export class SliderComponent implements OnInit, OnChanges, OnDestroy, ControlVal
 
     _position: number | number[] = 0;
 
-    /** @hidden */
-    private _subscriptions = new Subscription();
-
     /** Control value */
     @Input()
     get value(): SliderControlValue {
