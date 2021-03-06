@@ -14,7 +14,7 @@ import {
 import { NgControl, NgForm } from '@angular/forms';
 
 import { BaseInput } from '../form/base.input';
-import { ContentDensity, FormField, FormFieldControl } from '../form/public_api';
+import { FormField, FormFieldControl } from '../form/public_api';
 import { SliderTickMark } from '@fundamental-ngx/core';
 
 export type SliderCustomValue = Omit<SliderTickMark, 'position'>;
@@ -98,17 +98,6 @@ export class SliderComponent extends BaseInput {
     set value(selectValue: any) {
         this.setValue(selectValue);
     }
-
-    /** content Density of element. cozy | compact */
-    @Input()
-    set contentDensity(contentDensity: ContentDensity) {
-        this._contentDensity = contentDensity;
-    }
-    get contentDensity(): ContentDensity {
-        return this._contentDensity;
-    }
-    /** @hidden - Avoiding private property name collision */
-    _contentDensity: ContentDensity = 'compact';
 
     /**
      * Event fired when the state of the slider changes.

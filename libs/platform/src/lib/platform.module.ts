@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Injector, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FundamentalNgxCoreModule } from '@fundamental-ngx/core';
@@ -46,6 +46,7 @@ import { PlatformUploadCollectionModule } from './components/upload-collection';
 import { PlatformValueHelpDialogModule } from './components/value-help-dialog/value-help-dialog.module';
 import { ActionListItemModule, DisplayListItemModule, ObjectListItemModule, PlatformListModule, StandardListItemModule } from './components/list/public_api';
 import { PlatformSliderModule } from './components/slider';
+import { PlatformConfig } from './platform.config';
 
 @NgModule({
     imports: [CommonModule, FundamentalNgxCoreModule],
@@ -101,4 +102,8 @@ import { PlatformSliderModule } from './components/slider';
         PlatformSliderModule
     ]
 })
-export class FundamentalNgxPlatformModule {}
+export class FundamentalNgxPlatformModule {
+    constructor(injector: Injector) {
+        PlatformConfig.setInjector(injector);
+    }
+}

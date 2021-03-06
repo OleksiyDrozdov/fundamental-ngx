@@ -14,7 +14,7 @@ export class ListConfig {
     /**
      * Content Density of element. 'cozy' | 'compact'
      */
-    contentDensity: ContentDensity = 'cozy';
+    contentDensity: ContentDensity = null;
 
     /**
      * String matching strategy for typeahead list. Default: 'starts with'

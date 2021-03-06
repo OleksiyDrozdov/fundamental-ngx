@@ -17,7 +17,7 @@ export class ComboboxConfig {
     /**
      * Content Density of element. 'cozy' | 'compact'
      */
-    contentDensity: ContentDensity;
+    contentDensity: ContentDensity = null;
 
     /**
      * String matching strategy for typeahead list. Default: 'starts with'

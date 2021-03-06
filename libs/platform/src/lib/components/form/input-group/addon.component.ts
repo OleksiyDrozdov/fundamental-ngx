@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 
 import { ButtonComponent } from '../../button/button.component';
-import { ContentDensity } from '../form-options';
+import { ContentDensity } from '@fundamental-ngx/core';
 
 import { CSS_CLASS_NAME, INPUT_GROUP_CHILD_TOKEN } from './constants';
 
@@ -81,7 +81,7 @@ export class InputGroupAddonComponent implements AfterContentInit {
     }
 
     /** @hidden */
-    private _contentDensity: ContentDensity;
+    private _contentDensity: ContentDensity = null;
 
     /** @hidden */
     private _disabled = false;
