@@ -1,6 +1,6 @@
-<fd-resizable-card-layout [layoutConfig]="layoutConfig">
-    <fd-resizable-card-item *fdRsCardDef="1" [left]="0">
-        <fd-card>
+<div style="width: 1280px; height: 900px;">
+    <fd-resizable-card-layout [layoutConfig]="layoutConfig">
+        <fd-card *fdRsCardDef="1">
             <fd-card-header>
                 <h2 fd-card-title>Card Title 1</h2>
             </fd-card-header>
@@ -24,9 +24,8 @@
                 </ul>
             </fd-card-content>
         </fd-card>
-    </fd-resizable-card-item>
-    <fd-resizable-card-item *fdRsCardDef="2">
-        <fd-card>
+
+        <fd-card *fdRsCardDef="2">
             <fd-card-header>
                 <h2 fd-card-title>Card Title 2</h2>
             </fd-card-header>
@@ -50,10 +49,8 @@
                 </ul>
             </fd-card-content>
         </fd-card>
-    </fd-resizable-card-item>
 
-    <fd-resizable-card-item *fdRsCardDef="3">
-        <fd-card>
+        <fd-card *fdRsCardDef="3">
             <fd-card-header>
                 <h2 fd-card-title>Card Title 3</h2>
             </fd-card-header>
@@ -77,10 +74,8 @@
                 </ul>
             </fd-card-content>
         </fd-card>
-    </fd-resizable-card-item>
 
-    <!-- <fd-resizable-card-item *fdRsCardDef="4" [left]="'51rem'" [config]="layoutConfig[3]">
-        <fd-card>
+        <fd-card *fdRsCardDef="4">
             <fd-card-header>
                 <h2 fd-card-title>Card Title 4</h2>
             </fd-card-header>
@@ -104,9 +99,8 @@
                 </ul>
             </fd-card-content>
         </fd-card>
-    </fd-resizable-card-item>
 
-    <fd-resizable-card-item *fdRsCardDef="5" [left]="'51rem'" [config]="layoutConfig[4]">
+        <!-- <fd-resizable-card-item *fdRsCardDef="5" [left]="'51rem'" [config]="layoutConfig[4]">
         <fd-card>
             <fd-card-header>
                 <h2 fd-card-title>Card Title 5</h2>
@@ -186,4 +180,5 @@
             </fd-card-content>
         </fd-card>
     </fd-resizable-card-item> -->
-</fd-resizable-card-layout>
+    </fd-resizable-card-layout>
+</div>

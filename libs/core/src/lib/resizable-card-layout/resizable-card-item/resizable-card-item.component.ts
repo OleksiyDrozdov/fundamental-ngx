@@ -30,6 +30,8 @@ export interface ResizableCardItemConfig {
     resizable?: boolean;
 }
 
+let cardRank = 1;
+
 @Component({
     selector: 'fd-resizable-card-item',
     templateUrl: 'resizable-card-item.component.html',
@@ -38,29 +40,7 @@ export interface ResizableCardItemConfig {
     encapsulation: ViewEncapsulation.None
 })
 export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
-    @Input()
-    id: string;
-
-    @Input()
-    title: string;
-
-    @Input()
-    rank: number;
-
-    /** card width in px. Default value to 20rem */
-    @Input()
-    cardWidth: number = HorizontalResizeStep;
-
-    /** card height in px */
-    @Input()
-    cardHeight: number;
-
-    @Input()
-    miniHeaderHeight: number;
-
-    @Input()
-    miniContentHeight: number;
-
+    /** Set config from parent */
     @Input()
     get config(): ResizableCardItemConfig {
         return this._config;
@@ -72,28 +52,19 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
         this._changeDetectorRef.detectChanges();
     }
 
-    @Input()
-    forceRender = true;
+    @HostBinding('style.z-index')
+    zIndex = 0;
+
+    @HostBinding('style.position')
+    position = 'absolute';
 
     @Input()
-    resizable = true;
+    @HostBinding('style.left.px')
+    left = 0;
 
     @Input()
-    resizeBoth = true;
-
-    @Input()
-    resizeHorizontal = false;
-
-    @Input()
-    resizeVertical = false;
-
-    @Input()
-    @HostBinding('style.left')
-    left = '0';
-
-    @Input()
-    @HostBinding('style.top')
-    top = '0';
+    @HostBinding('style.top.px')
+    top = 0;
 
     @Output()
     stepChange: any;
@@ -113,27 +84,33 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
     @Output()
     miniContentReached: any;
 
-    @HostBinding('style.z-index')
-    zIndex = 0;
+    id: string;
 
-    @HostBinding('style.position')
-    position = 'absolute';
+    title: string;
 
-    @ViewChild('cornerHandle')
-    cornerHandle: ElementRef;
+    rank: number = cardRank++;
 
-    @ViewChild('horizontalHandle')
-    horizontalHandle: ElementRef;
+    /** card width in px. Default value to 20rem */
+    cardWidth: number = HorizontalResizeStep;
 
-    @ViewChild('verticalHandle')
-    verticalHandle: ElementRef;
+    /** card height in px */
+    cardHeight: number;
 
-    @ViewChild('resizeCard')
-    cardElementRef: ElementRef;
+    miniHeaderHeight: number;
+
+    miniContentHeight: number;
 
     showResizeIcon = true;
 
     showBorder = false;
+
+    resizable = true;
+
+    resizeBoth = true;
+
+    resizeHorizontal = false;
+
+    resizeVertical = false;
 
     private verticalHandleSub: Subscription = Subscription.EMPTY;
     private horizontalHandleSub: Subscription = Subscription.EMPTY;
@@ -152,16 +129,13 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
     }
 
     private _initialSetup(): void {
-        console.log('item _initialSetup: ', this._config);
-        this.title = this.title || this._config.title;
-        this.rank = this.rank || this._config.rank;
-        this.cardWidth = this._config.cardWidth;
+        this.cardWidth = this._config.cardWidth || this.cardWidth;
         this.cardHeight = this._config.cardHeight;
-        this.miniHeaderHeight = this.miniHeaderHeight || this._config.miniHeaderHeight;
-        this.miniContentHeight = this.miniContentHeight || this._config.miniContentHeight;
+        this.title = this._config.title;
+        this.rank = this._config.rank || this.rank;
+        this.miniHeaderHeight = this._config.miniHeaderHeight;
+        this.miniContentHeight = this._config.miniContentHeight;
         this.resizable = this.resizable || this._config.resizable;
-        console.log('item _initialSetup this.cardWidth: ', this.cardWidth);
-        console.log('item _initialSetup this.cardHeight: ', this.cardHeight);
     }
 
     onMouseDown(event: MouseEvent, resizeDirection: ResizeDirection): void {
