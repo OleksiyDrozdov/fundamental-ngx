@@ -95,7 +95,7 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
         if (this._contentDensity === null && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.contentDensity = density;
-                this.detectChanges();
+                this.markForCheck();
             }));
         }
     }

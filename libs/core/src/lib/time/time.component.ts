@@ -199,7 +199,7 @@ export class TimeComponent<D> implements OnInit, OnChanges, OnDestroy, AfterView
         if (this.compact === null && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
-                this._changeDetectorRef.detectChanges();
+                this._changeDetectorRef.markForCheck();
             }))
         }
     }

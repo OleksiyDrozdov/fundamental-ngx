@@ -147,7 +147,7 @@ export class SplitButtonComponent implements AfterContentInit, OnChanges, OnDest
             this._contentDensitySubscription.add(
                 this._contentDensityService.contentDensity.subscribe((density) => {
                     this.compact = density === 'compact';
-                    this._cdRef.detectChanges();
+                    this._cdRef.markForCheck();
                 })
             );
         }

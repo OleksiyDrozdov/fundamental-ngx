@@ -140,7 +140,7 @@ export class ActionSheetComponent implements AfterContentInit, AfterViewInit, On
                 this.actionSheetBody.compact = density === 'compact';
                 this.actionSheetItems.forEach(item => {
                     item.compact = density === 'compact';
-                    this._changeDetectionRef.detectChanges();
+                    this._changeDetectionRef.markForCheck();
                 });
             }));
         }

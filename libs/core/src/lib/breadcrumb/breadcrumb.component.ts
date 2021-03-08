@@ -102,7 +102,7 @@ export class BreadcrumbComponent implements AfterContentInit, OnInit, OnDestroy 
         if (this.compact === null && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
-                this._cdRef.detectChanges();
+                this._cdRef.markForCheck();
             }));
         }
     }

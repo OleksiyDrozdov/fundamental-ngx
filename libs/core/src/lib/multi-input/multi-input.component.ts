@@ -271,7 +271,7 @@ export class MultiInputComponent implements
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
                 this.buildComponentCssClass();
-                this._changeDetRef.detectChanges();
+                this._changeDetRef.markForCheck();
             }))
         }
         this.buildComponentCssClass();

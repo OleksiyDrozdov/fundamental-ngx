@@ -194,7 +194,7 @@ export class TokenizerComponent implements AfterViewChecked, AfterViewInit, Afte
         if (this.compact === null && this._contentDensityService) {
             this._contentDensitySubscription.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
-                this._cdRef.detectChanges();
+                this._cdRef.markForCheck();
                 this.buildComponentCssClass();
             }))
         }
