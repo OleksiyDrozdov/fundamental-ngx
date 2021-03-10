@@ -3,16 +3,18 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    EventEmitter,
     HostBinding,
     HostListener,
     Input,
     OnDestroy,
+    OnInit,
     Output,
-    ViewChild,
     ViewEncapsulation
 } from '@angular/core';
 import { FocusableOption } from '@angular/cdk/a11y';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 export type ResizeDirection = 'vertical' | 'horizontal' | 'both';
 
@@ -30,6 +32,24 @@ export interface ResizableCardItemConfig {
     resizable?: boolean;
 }
 
+export class PositionChange {
+    constructor(public xPositionChange: number, public yPositionChange: number) {}
+}
+
+export class ResizingEvent {
+    constructor(public card: ResizableCardItemComponent, public positionChange: PositionChange) {}
+}
+
+export class ResizedEvent {
+    constructor(
+        public card: ResizableCardItemComponent,
+        public prevCardWidth: number,
+        public prevCardHeight: number,
+        public cardWidth: number,
+        public cardHeight: number
+    ) {}
+}
+
 let cardRank = 1;
 
 @Component({
@@ -39,7 +59,11 @@ let cardRank = 1;
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None
 })
-export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
+export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableOption {
+    /** @hidden */
+    @HostBinding()
+    tabindex = 0;
+
     /** Set config from parent */
     @Input()
     get config(): ResizableCardItemConfig {
@@ -67,22 +91,22 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
     top = 0;
 
     @Output()
-    stepChange: any;
+    stepChange: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
 
     @Output()
-    resizing: any;
+    resizing: EventEmitter<ResizingEvent> = new EventEmitter<ResizingEvent>();
 
     @Output()
-    resized: any;
+    resized: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
 
     @Output()
-    dropped: any;
+    dropped: EventEmitter<any> = new EventEmitter<any>();
 
     @Output()
-    miniHeaderReached: any;
+    miniHeaderReached: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
 
     @Output()
-    miniContentReached: any;
+    miniContentReached: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
 
     id: string;
 
@@ -112,21 +136,25 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
 
     resizeVertical = false;
 
-    private verticalHandleSub: Subscription = Subscription.EMPTY;
-    private horizontalHandleSub: Subscription = Subscription.EMPTY;
+    private _resizeDebounce$: Subject<PositionChange> = new Subject<PositionChange>();
 
     private _config: ResizableCardItemConfig;
     private _prevX: number;
     private _prevY: number;
+    private _prevCardWidth: number;
+    private _prevCardHeight: number;
     private _resize = false;
     private _resizeDirection: ResizeDirection;
 
     constructor(private _changeDetectorRef: ChangeDetectorRef, private _elementRef: ElementRef) {}
 
-    ngOnDestroy(): void {
-        this.verticalHandleSub.unsubscribe();
-        this.horizontalHandleSub.unsubscribe();
+    ngOnInit(): void {
+        this._resizeDebounce$.pipe(debounceTime(20)).subscribe((positionChange: PositionChange) => {
+            this.resizing.emit(new ResizingEvent(this, positionChange));
+        });
     }
+
+    ngOnDestroy(): void {}
 
     private _initialSetup(): void {
         this.cardWidth = this._config.cardWidth || this.cardWidth;
@@ -144,6 +172,8 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
         this._resize = true;
         this._prevX = event.clientX;
         this._prevY = event.clientY;
+        this._prevCardWidth = this.cardWidth;
+        this._prevCardHeight = this.cardHeight;
         this._resizeDirection = resizeDirection;
     }
 
@@ -153,24 +183,95 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
         if (!this._resize) {
             return;
         }
+
+        // resizing card will go over other cards
         this.zIndex = 1;
 
         if (this._resizeDirection === 'both') {
             this.cardWidth = this.cardWidth - (this._prevX - event.clientX);
-            this.cardHeight = this.cardHeight - (this._prevY - event.clientY);
+            this._verticalResizing(event.clientY);
         } else if (this._resizeDirection === 'horizontal') {
             this.cardWidth = this.cardWidth - (this._prevX - event.clientX);
         } else {
-            this.cardHeight = this.cardHeight - (this._prevY - event.clientY);
+            this._verticalResizing(event.clientY);
         }
+
+        this._resizeDebounce$.next(new PositionChange(this._prevX - event.clientX, this._prevY - event.clientY));
+
+        const heightDiff = Math.abs(this.cardHeight - this._prevCardHeight);
+        const widthDiff = Math.abs(this.cardWidth - this._prevCardWidth);
+        if (
+            (heightDiff > 0 && heightDiff % verticalResizeStep === 0) ||
+            (widthDiff > 0 && widthDiff % HorizontalResizeStep === 0)
+        ) {
+            this.stepChange.emit(this._getResizedEventObject());
+        }
+
         this._prevX = event.clientX;
         this._prevY = event.clientY;
     }
 
+    private _verticalResizing(yPosition: number): void {
+        // TODO: vertical resize step is 1rem
+        if (this.cardHeight === this.miniHeaderHeight) {
+            // decreasing height
+            if (this._prevY - yPosition > 0) {
+                // if miniHeader height reached, stop resizing
+                return;
+            } else {
+                // increasing height
+                this.cardHeight = this.miniHeaderHeight + this.miniContentHeight;
+                this._stopResizing();
+                this.miniContentReached.emit(this._getResizedEventObject());
+            }
+        } else if (this.cardHeight < this.miniContentHeight + this.miniHeaderHeight) {
+            // have to do both way. increase height and decrease height
+            if (this._prevY - yPosition > 0) {
+                // if miniHeader height reached, stop resizing
+                this.cardHeight = this.miniHeaderHeight;
+                this._stopResizing();
+                this.miniHeaderReached.emit(this._getResizedEventObject());
+            } else {
+                this.cardHeight = this.miniHeaderHeight + this.miniContentHeight;
+                this._stopResizing();
+                this.miniContentReached.emit(this._getResizedEventObject());
+            }
+        } else {
+            this.cardHeight = this.cardHeight - (this._prevY - yPosition);
+        }
+
+        // stop resizing on miniContent
+        if (this.cardHeight <= this.miniContentHeight + this.miniHeaderHeight) {
+            this.miniContentReached.emit(this._getResizedEventObject());
+            this._stopResizing();
+        }
+    }
+
     onMouseUp(event: MouseEvent, resizeDirection: ResizeDirection): void {
-        this._resize = false;
-        this.zIndex = 0;
-        this.showBorder = false;
+        if (Math.abs(this.cardWidth - this._prevCardWidth) > 0) {
+            this._horizontalResizing();
+        }
+        this._stopResizing();
+    }
+
+    /**
+     * make horizontal resize only on step of 20rem
+     * raise stepChange event
+     */
+    private _horizontalResizing(): void {
+        // positive value indicates that width has increased
+        const widthIncrement = this.cardWidth - this._prevCardWidth;
+        const cardSpan = Math.floor(this.cardWidth / HorizontalResizeStep);
+        const cardSpanFraction = this.cardWidth % HorizontalResizeStep;
+
+        if (widthIncrement > 0) {
+            this.cardWidth =
+                cardSpanFraction > 0 ? (cardSpan + 1) * HorizontalResizeStep : cardSpan * HorizontalResizeStep;
+        } else {
+            this.cardWidth = cardSpan * HorizontalResizeStep;
+        }
+
+        this.stepChange.emit(this._getResizedEventObject());
     }
 
     /** Sets focus on the element */
@@ -196,5 +297,22 @@ export class ResizableCardItemComponent implements OnDestroy, FocusableOption {
 
     detectChanges(): void {
         this._changeDetectorRef.detectChanges();
+    }
+
+    stopCardResizing(): void {
+        if (this._resize) {
+            this._stopResizing();
+        }
+    }
+
+    private _stopResizing(): void {
+        this._resize = false;
+        this.zIndex = 0;
+        this.showBorder = false;
+        this.resized.emit(this._getResizedEventObject());
+    }
+
+    private _getResizedEventObject(): ResizedEvent {
+        return new ResizedEvent(this, this._prevCardWidth, this._prevCardHeight, this.cardWidth, this.cardHeight);
     }
 }

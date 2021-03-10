@@ -1,6 +1,8 @@
 <div #layout class="fd-resizable-card-layout" [ngClass]="'fd-resizable-card-layout--'+layoutSize">
     <ng-container *ngFor="let card of resizeCardDirectives; let i=index">
-        <fd-resizable-card-item [config]="layoutConfig[i]">
+        <fd-resizable-card-item [config]="layoutConfig[i]" (resizing)="cardResizing($event)"
+            (resized)="cardResizeComplete($event)" (miniHeaderReached)="miniHeaderReached($event)"
+            (miniContentReached)="miniContentReached($event)" (stepChange)="cardStepped($event)">
             <ng-container *ngTemplateOutlet="card?.template"> </ng-container>
         </fd-resizable-card-item>
     </ng-container>

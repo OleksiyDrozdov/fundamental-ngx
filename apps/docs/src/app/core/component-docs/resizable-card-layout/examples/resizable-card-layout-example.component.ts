@@ -17,7 +17,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
                 cardWidth: 320,
                 cardHeight: 400,
                 miniHeaderHeight: 80,
-                miniContentHeight: 100,
+                miniContentHeight: 150,
                 resizable: true
             },
             {
@@ -42,7 +42,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
                 title: 'card4',
                 rank: 4,
                 cardWidth: 640,
-                cardHeight: 250,
+                cardHeight: 225,
                 miniHeaderHeight: 80,
                 miniContentHeight: 100,
                 resizable: true
@@ -51,7 +51,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
                 title: 'card5',
                 rank: 5,
                 cardWidth: 640,
-                cardHeight: 200,
+                cardHeight: 225,
                 miniHeaderHeight: 80,
                 miniContentHeight: 100,
                 resizable: true
@@ -60,7 +60,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
                 title: 'card6',
                 rank: 6,
                 cardWidth: 640,
-                cardHeight: 200,
+                cardHeight: 225,
                 miniHeaderHeight: 80,
                 miniContentHeight: 100,
                 resizable: true
@@ -69,7 +69,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
                 title: 'card7',
                 rank: 7,
                 cardWidth: 640,
-                cardHeight: 200,
+                cardHeight: 225,
                 miniHeaderHeight: 80,
                 miniContentHeight: 100,
                 resizable: true

@@ -7,6 +7,7 @@ import {
     ContentChildren,
     Directive,
     ElementRef,
+    HostListener,
     Input,
     OnInit,
     QueryList,
@@ -16,14 +17,18 @@ import {
     ViewContainerRef,
     ViewEncapsulation
 } from '@angular/core';
+import { FocusKeyManager } from '@angular/cdk/a11y';
 
-import { ResizableCardItemComponent } from './resizable-card-item/resizable-card-item.component';
-import { ResizableCardItemConfig } from './resizable-card-item/resizable-card-item.component';
+import {
+    HorizontalResizeStep,
+    ResizingEvent,
+    ResizedEvent,
+    ResizableCardItemComponent,
+    ResizableCardItemConfig
+} from './resizable-card-item/resizable-card-item.component';
 
 let cardRank = 1;
-const DRAG_START_DELAY = 200;
-const cardWidthResizeStep = 320; // 20rem
-const cardHeightResizeStep = 16; // 1rem
+const DRAG_START_DELAY = 500;
 export type LayoutSize = 'sm' | 'md' | 'lg';
 export type ResizableCardLayoutConfig = Array<ResizableCardItemConfig>;
 
@@ -69,16 +74,23 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     layoutSize: LayoutSize = 'md';
     columns = 4; // TODO: set according to layoutSize
     columnsHeight: Array<number>;
-
+    disableDragDrop = false;
+    dragStartDelay = DRAG_START_DELAY;
     resizeCardDirectivesArray: ResizableCardDefinitionDirective[];
 
-    private _dirty = true;
     private _availableLayoutWidth: number;
     private _sortedCards: Array<ResizableCardItemComponent>;
+    /** @hidden FocusKeyManager instance */
+    private _keyboardEventsManager: FocusKeyManager<ResizableCardItemComponent>;
+
     constructor(private _changeDetectorRef: ChangeDetectorRef) {}
 
     ngOnInit(): void {
         this.columnsHeight = new Array(this.columns);
+        this._initHeightArray();
+    }
+
+    private _initHeightArray(): void {
         for (let index = 0; index < this.columns; index++) {
             this.columnsHeight[index] = 0;
         }
@@ -86,16 +98,30 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
 
     /** @hidden */
     ngAfterViewInit(): void {
+        this._accessibilitySetup();
         this._availableLayoutWidth = this.layoutWidth.nativeElement.getBoundingClientRect().width;
+        console.log('_availableLayoutWidth: ', this._availableLayoutWidth);
         this.arrangeCards(this.resizeCardItems.toArray());
         this._changeDetectorRef.detectChanges();
     }
 
     ngAfterViewChecked(): void {
-        if (this._dirty) {
-            this._dirty = false;
+        console.log('ngAfterViewChecked width Available: ', this.layoutWidth.nativeElement.getBoundingClientRect().width);
+    }
 
-            this._changeDetectorRef.markForCheck();
+    /** @hidden */
+    @HostListener('keydown', ['$event'])
+    handleKeydown(event: KeyboardEvent): void {
+        event.stopImmediatePropagation();
+        if (!this._keyboardEventsManager.activeItemIndex) {
+            this._keyboardEventsManager.setFirstItemActive();
+            console.log('setting first item active');
+        }
+
+        console.log('listen keydown event manager: ', this._keyboardEventsManager);
+
+        if (this._keyboardEventsManager) {
+            this._keyboardEventsManager.onKeydown(event);
         }
     }
 
@@ -108,9 +134,36 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         });
     }
 
+    cardResizing(event: ResizingEvent): void {
+        this.disableDragDrop = true;
+    }
+
+    cardResizeComplete(event: ResizedEvent): void {
+        this.disableDragDrop = false;
+        this._initHeightArray();
+        this.arrangeCards(this.resizeCardItems.toArray());
+    }
+
+    miniHeaderReached(event: ResizedEvent): void {
+        console.log('card mini header reached: ', event);
+    }
+
+    miniContentReached(event: ResizedEvent): void {
+        console.log('card mini content reached: ', event);
+    }
+
+    cardStepped(event: ResizedEvent): void {
+        console.log('card Step change: ', event);
+    }
+
+    /** @hidden */
+    private _accessibilitySetup(): void {
+        this._keyboardEventsManager = new FocusKeyManager(this.resizeCardItems).withWrap();
+    }
+
     private _updateColumnsHeight(card: ResizableCardItemComponent): void {
-        const columnsStart = Math.floor(card.left / cardWidthResizeStep);
-        const columnsSpan = Math.floor((card.left + card.cardWidth) / cardWidthResizeStep);
+        const columnsStart = Math.floor(card.left / HorizontalResizeStep);
+        const columnsSpan = Math.floor((card.left + card.cardWidth) / HorizontalResizeStep);
         const columnHeight = card.cardHeight + card.top;
 
         for (let i = columnsStart; i < columnsSpan; i++) {
@@ -118,8 +171,8 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         }
     }
 
-    private _setCardPositionValues(card: ResizableCardItemComponent, rank: number): void {
-        if (rank === 0) {
+    private _setCardPositionValues(card: ResizableCardItemComponent, index: number): void {
+        if (index === 0) {
             card.left = 0;
             card.top = 0;
             return;
@@ -148,7 +201,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         }
 
         // start from previous indexes
-        const cardColSpan = Math.floor(card.cardWidth / cardWidthResizeStep);
+        const cardColSpan = Math.floor(card.cardWidth / HorizontalResizeStep);
 
         // check for each card position, starting from leftmost
         let isFitting = false;
@@ -192,7 +245,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         }
 
         if (isFitting) {
-            card.left = startingColumnPosition * cardWidthResizeStep;
+            card.left = startingColumnPosition * HorizontalResizeStep;
             card.top = height;
         }
         return isFitting;
@@ -212,14 +265,6 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
             return first - second;
         }
         return uniqueHeights;
-    }
-
-    onCardResize(): void {
-        this._dirty = true;
-    }
-
-    onDragDrop(): void {
-        this._dirty = true;
     }
 
     sortCards(firstCard: ResizableCardItemComponent, secondCard: ResizableCardItemComponent): number {
