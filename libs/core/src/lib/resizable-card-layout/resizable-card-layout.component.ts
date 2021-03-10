@@ -74,7 +74,6 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     layoutSize: LayoutSize = 'md';
     columns = 4; // TODO: set according to layoutSize
     columnsHeight: Array<number>;
-    disableDragDrop = false;
     dragStartDelay = DRAG_START_DELAY;
     resizeCardDirectivesArray: ResizableCardDefinitionDirective[];
 
@@ -91,6 +90,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     }
 
     private _initHeightArray(): void {
+        console.log('this.columns: ', this.columns);
         for (let index = 0; index < this.columns; index++) {
             this.columnsHeight[index] = 0;
         }
@@ -106,7 +106,10 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     }
 
     ngAfterViewChecked(): void {
-        console.log('ngAfterViewChecked width Available: ', this.layoutWidth.nativeElement.getBoundingClientRect().width);
+        console.log(
+            'ngAfterViewChecked width Available: ',
+            this.layoutWidth.nativeElement.getBoundingClientRect().width
+        );
     }
 
     /** @hidden */
@@ -115,10 +118,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         event.stopImmediatePropagation();
         if (!this._keyboardEventsManager.activeItemIndex) {
             this._keyboardEventsManager.setFirstItemActive();
-            console.log('setting first item active');
         }
-
-        console.log('listen keydown event manager: ', this._keyboardEventsManager);
 
         if (this._keyboardEventsManager) {
             this._keyboardEventsManager.onKeydown(event);
@@ -128,18 +128,19 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     arrangeCards(cards: Array<ResizableCardItemComponent>): void {
         // sort based on the card rank
         this._sortedCards = cards.sort(this.sortCards);
-        this._sortedCards.forEach((card, i) => {
-            this._setCardPositionValues(card, i);
+        this._sortedCards.forEach((card, index) => {
+            console.log('positioning card: ', card);
+            console.log('positioning card at index: ', index);
+            this._setCardPositionValues(card, index);
+            console.log('before updating height: ', this.columnsHeight);
             this._updateColumnsHeight(card);
+            console.log('after updating height: ', this.columnsHeight);
         });
     }
 
-    cardResizing(event: ResizingEvent): void {
-        this.disableDragDrop = true;
-    }
+    cardResizing(event: ResizingEvent): void {}
 
     cardResizeComplete(event: ResizedEvent): void {
-        this.disableDragDrop = false;
         this._initHeightArray();
         this.arrangeCards(this.resizeCardItems.toArray());
     }
@@ -207,18 +208,35 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         let isFitting = false;
         let startingColumnPosition = -1;
 
+        // eg. [1, 2, 3, 4] columnsPositions
+        console.log('left columnPositions: ', columnPositions);
         for (const columnPosition of columnPositions) {
-            // columnPosition-1 ->convert as index
-            // columnPosition -1 - (numberOfCardColumns -1) at least 1 column of card on current column
             if (!isFitting) {
+                // columnPosition-1 ->convert as index
+                // columnPosition -1 - (numberOfCardColumns -1) at least 1 column of card on current column
                 for (let i = columnPosition - cardColSpan; i < columnPosition - 1 && i > -1 && !isFitting; i++) {
+                    console.log('going left i: ', i);
+                    // if previous column heights are less then card will fix starting from previous columns as well
                     if (this.columnsHeight[i] > this.columnsHeight[columnPosition - 1]) {
                         isFitting = false;
+                        console.log('left false isFitting: ', isFitting);
                     } else {
                         isFitting = true;
                         startingColumnPosition = i;
+                        console.log('left true isFitting: ', isFitting);
+                        console.log('left true startingColumnPosition: ', startingColumnPosition);
                     }
                 }
+
+                // if card spans more than available columns. then it will not fit.
+                // console.log('left columnPosition: ', columnPosition);
+                // console.log('left cardColSpan: ', cardColSpan);
+                // console.log('left this.columns: ', this.columns);
+                // if (!isFitting && columnPosition + cardColSpan - 1 > this.columns) {
+                //     console.log('left inside condition');
+                //     isFitting = false;
+                //     break;
+                // }
             } else {
                 break;
             }
@@ -226,25 +244,40 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
 
         // if not moving towards left. start from column position and check if fits.
         if (!isFitting) {
+            console.log('right columnPositions: ', columnPositions);
             for (const columnPosition of columnPositions) {
-                // one column is at columnPosition
-                for (let i = cardColSpan - 1; i > 0 && !isFitting; i--) {
-                    if (this.columnsHeight[columnPosition - 1 + i] > this.columnsHeight[columnPosition - 1]) {
-                        isFitting = false;
-                    } else {
+                if (!isFitting) {
+                    if (height === 0 && cardColSpan + columnPosition - 1 <= this.columns && !isFitting) {
                         isFitting = true;
                         startingColumnPosition = columnPosition - 1;
+                        break;
                     }
-                }
 
-                if (height === 0 && cardColSpan === 1 && !isFitting) {
-                    isFitting = true;
-                    startingColumnPosition = columnPosition - 1;
+                    // if card spans more than available columns. then it will not fit.
+                    console.log('right columnPosition: ', columnPosition);
+                    console.log('right cardColSpan: ', cardColSpan);
+                    console.log('right this.columns: ', this.columns);
+                    if (columnPosition + cardColSpan - 1 > this.columns) {
+                        console.log('right inside condition');
+                        isFitting = false;
+                        break;
+                    }
+
+                    // one column is at columnPosition
+                    for (let i = cardColSpan - 1; i > 0 && !isFitting; i--) {
+                        if (this.columnsHeight[columnPosition - 1 + i] > this.columnsHeight[columnPosition - 1]) {
+                            isFitting = false;
+                        } else {
+                            isFitting = true;
+                            startingColumnPosition = columnPosition - 1;
+                        }
+                    }
                 }
             }
         }
 
         if (isFitting) {
+            console.log('startingColumnPosition: ', startingColumnPosition);
             card.left = startingColumnPosition * HorizontalResizeStep;
             card.top = height;
         }
