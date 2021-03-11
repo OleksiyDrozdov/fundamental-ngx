@@ -61,7 +61,7 @@ export class InputGroupComponent implements ControlValueAccessor, OnInit, OnDest
 
     /** Whether the input group is in compact mode. */
     @Input()
-    compact: boolean = null;
+    compact?: boolean;
 
     /** Whether the input group is inline. */
     @Input()
@@ -178,7 +178,7 @@ export class InputGroupComponent implements ControlValueAccessor, OnInit, OnDest
     /** @hidden */
     ngOnInit(): void {
         this._listenElementEvents();
-        if (this.compact === null && this._contentDensityService) {
+        if (this.compact === undefined && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
                 this.changeDetectorRef.markForCheck();

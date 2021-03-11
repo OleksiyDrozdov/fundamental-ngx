@@ -76,7 +76,7 @@ export class SwitchComponent implements ControlValueAccessor, OnInit, OnDestroy 
 
     /** Whether the switch is compact */
     @Input()
-    compact: boolean = null;
+    compact?: boolean;
 
     /** aria-label attribute of the inner input element. */
     @Input()
@@ -117,7 +117,7 @@ export class SwitchComponent implements ControlValueAccessor, OnInit, OnDestroy 
 
     /** @hidden */
     ngOnInit(): void {
-        if (this.compact === null && this._contentDensityService) {
+        if (this.compact === undefined && this._contentDensityService) {
             this._subscriptions.add(
                 this._contentDensityService.contentDensity.subscribe((density) => {
                     this.compact = density === 'compact';

@@ -46,7 +46,7 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
         return this._contentDensity;
     }
     /** @hidden - Avoiding private property name collision */
-    _contentDensity: ContentDensity = null;
+    _contentDensity: ContentDensity;
     protected _contentDensityService: ContentDensityService;
 
     /** @hidden */
@@ -92,7 +92,7 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 
     /** @hidden */
     private _setupDensitySubscriptions(): void {
-        if (this._contentDensity === null && this._contentDensityService) {
+        if (this._contentDensity === undefined && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.contentDensity = density;
                 this.markForCheck();

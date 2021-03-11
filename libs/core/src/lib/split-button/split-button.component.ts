@@ -57,7 +57,7 @@ import { ContentDensityService } from '../utils/public_api';
 export class SplitButtonComponent implements AfterContentInit, OnChanges, OnDestroy, OnInit {
     /** Whether to apply compact mode to the button. */
     @Input()
-    compact: boolean = null;
+    compact?: boolean;
 
     /** The icon to include in the button. See the icon page for the list of icons. */
     @Input()
@@ -143,7 +143,7 @@ export class SplitButtonComponent implements AfterContentInit, OnChanges, OnDest
 
     /** @hidden */
     ngOnInit(): void {
-        if (this.compact === null && this._contentDensityService) {
+        if (this.compact === undefined && this._contentDensityService) {
             this._contentDensitySubscription.add(
                 this._contentDensityService.contentDensity.subscribe((density) => {
                     this.compact = density === 'compact';

@@ -187,7 +187,7 @@ export class ComboboxComponent implements ComboboxInterface, ControlValueAccesso
 
     /** Whether the search input should be displayed in compact mode. */
     @Input()
-    compact: boolean = null;
+    compact?: boolean;
 
     /** Whether the matching string should be highlighted during filtration. */
     @Input()
@@ -351,7 +351,7 @@ export class ComboboxComponent implements ComboboxInterface, ControlValueAccesso
     /** @hidden */
     ngOnInit(): void {
         this._refreshDisplayedValues();
-        if (this.compact === null && this._contentDensityService) {
+        if (this.compact === undefined && this._contentDensityService) {
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.compact = density === 'compact';
                 this._cdRef.markForCheck();
