@@ -73,7 +73,7 @@ export class MenuComponent implements OnInit, AfterViewInit, AfterContentInit, O
 
     /** Density for Menu */
     @Input()
-    contentDensity: ContentDensity = null;
+    contentDensity: ContentDensity;
 
     /**
      * Horizontal position of menu in relation to trigger element.

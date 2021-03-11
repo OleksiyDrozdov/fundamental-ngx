@@ -13,7 +13,7 @@ export class PlatformConfig {
     /**
      * Content Density of element. 'cozy' | 'compact'
      */
-    contentDensity: ContentDensity = 'cozy';
+    contentDensity: ContentDensity;
 
     static setInjector(injector: Injector): void {
         PlatformConfig.injector = injector;

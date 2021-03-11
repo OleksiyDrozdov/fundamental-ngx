@@ -81,7 +81,7 @@ export class InputGroupAddonComponent implements AfterContentInit {
     }
 
     /** @hidden */
-    private _contentDensity: ContentDensity = null;
+    private _contentDensity: ContentDensity;
 
     /** @hidden */
     private _disabled = false;

@@ -10,7 +10,7 @@ export class SwitchConfig {
     /**
      * Content Density of element. 'cozy' | 'compact'
      */
-    contentDensity: ContentDensity = null;
+    contentDensity: ContentDensity;
 
     /**
      * Create Provider factory function

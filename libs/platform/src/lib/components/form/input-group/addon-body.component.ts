@@ -45,7 +45,7 @@ export class InputGroupAddonBodyComponent implements OnInit {
     }
 
     /** @hidden */
-    private _contentDensity: ContentDensity = null;
+    private _contentDensity: ContentDensity;
 
     /**@hidden */
     constructor(private _elementRef: ElementRef<HTMLElement>, private _renderer: Renderer2) {}
