@@ -225,6 +225,17 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
                         startingColumnPosition = i;
                         console.log('left true isFitting: ', isFitting);
                         console.log('left true startingColumnPosition: ', startingColumnPosition);
+
+                        // is whole width of card will fit
+                        for (let columnIndex = 0; columnIndex < cardColSpan; columnIndex++) {
+                            if (
+                                this.columnsHeight[columnIndex + startingColumnPosition] > this.columnsHeight[columnPosition - 1]
+                            ) {
+                                // not full width is fitting
+                                isFitting = false;
+                                startingColumnPosition = -1;
+                            }
+                        }
                     }
                 }
 
@@ -270,6 +281,18 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
                         } else {
                             isFitting = true;
                             startingColumnPosition = columnPosition - 1;
+
+                            // is whole width of card will fit
+                            for (let columnIndex = 0; columnIndex < cardColSpan; columnIndex++) {
+                                if (
+                                    this.columnsHeight[columnIndex + startingColumnPosition] >
+                                    this.columnsHeight[columnPosition - 1]
+                                ) {
+                                    // not full width is fitting
+                                    isFitting = false;
+                                    startingColumnPosition = -1;
+                                }
+                            }
                         }
                     }
                 }
