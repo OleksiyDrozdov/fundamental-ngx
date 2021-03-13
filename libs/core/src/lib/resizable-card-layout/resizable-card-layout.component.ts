@@ -72,7 +72,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     layoutWidth: ElementRef;
 
     layoutSize: LayoutSize = 'md';
-    columns = 4; // TODO: set according to layoutSize
+    columns = 2; // TODO: set according to layoutSize
     columnsHeight: Array<number>;
     dragStartDelay = DRAG_START_DELAY;
     resizeCardDirectivesArray: ResizableCardDefinitionDirective[];
@@ -141,6 +141,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     cardResizing(event: ResizingEvent): void {}
 
     cardResizeComplete(event: ResizedEvent): void {
+        console.log('card resize complete: ', event);
         this._initHeightArray();
         this.arrangeCards(this.resizeCardItems.toArray());
     }
@@ -164,11 +165,18 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
 
     private _updateColumnsHeight(card: ResizableCardItemComponent): void {
         const columnsStart = Math.floor(card.left / HorizontalResizeStep);
+        // till which columns card spans
         const columnsSpan = Math.floor((card.left + card.cardWidth) / HorizontalResizeStep);
         const columnHeight = card.cardHeight + card.top;
-
+        console.log('columnsStart: ', columnsStart);
+        console.log('columnsSpan: ', columnsSpan);
+        console.log('columnHeight: ', columnHeight);
         for (let i = columnsStart; i < columnsSpan; i++) {
             this.columnsHeight[i] = columnHeight;
+        }
+
+        if (columnsStart === columnsSpan) {
+            this.columnsHeight[columnsStart] = columnHeight;
         }
     }
 

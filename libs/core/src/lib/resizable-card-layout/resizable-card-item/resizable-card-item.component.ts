@@ -200,6 +200,8 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
         const heightDiff = Math.abs(this.cardHeight - this._prevCardHeight);
         const widthDiff = Math.abs(this.cardWidth - this._prevCardWidth);
+
+        // if card dimension change in step. horizontal or vertical.
         if (
             (heightDiff > 0 && heightDiff % verticalResizeStep === 0) ||
             (widthDiff > 0 && widthDiff % HorizontalResizeStep === 0)
@@ -248,6 +250,8 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
     }
 
     onMouseUp(event: MouseEvent, resizeDirection: ResizeDirection): void {
+        console.log('mouse up now');
+        // make width of card in order of 20rem
         if (Math.abs(this.cardWidth - this._prevCardWidth) > 0) {
             this._horizontalResizing();
         }
@@ -309,6 +313,10 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
         this._resize = false;
         this.zIndex = 0;
         this.showBorder = false;
+        this._raiseResizeComplete();
+    }
+
+    private _raiseResizeComplete(): void {
         this.resized.emit(this._getResizedEventObject());
     }
 
