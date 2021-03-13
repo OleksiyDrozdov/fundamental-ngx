@@ -106,10 +106,10 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     }
 
     ngAfterViewChecked(): void {
-        console.log(
-            'ngAfterViewChecked width Available: ',
-            this.layoutWidth.nativeElement.getBoundingClientRect().width
-        );
+        // console.log(
+        //     'ngAfterViewChecked width Available: ',
+        //     this.layoutWidth.nativeElement.getBoundingClientRect().width
+        // );
     }
 
     /** @hidden */
@@ -226,10 +226,16 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
                         console.log('left true isFitting: ', isFitting);
                         console.log('left true startingColumnPosition: ', startingColumnPosition);
 
+                        if (startingColumnPosition + cardColSpan > this.columns) {
+                            isFitting = false;
+                            startingColumnPosition = -1;
+                        }
+
                         // is whole width of card will fit
                         for (let columnIndex = 0; columnIndex < cardColSpan; columnIndex++) {
                             if (
-                                this.columnsHeight[columnIndex + startingColumnPosition] > this.columnsHeight[columnPosition - 1]
+                                this.columnsHeight[columnIndex + startingColumnPosition] >
+                                this.columnsHeight[columnPosition - 1]
                             ) {
                                 // not full width is fitting
                                 isFitting = false;
@@ -274,26 +280,31 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
                         break;
                     }
 
-                    // one column is at columnPosition
-                    for (let i = cardColSpan - 1; i > 0 && !isFitting; i--) {
-                        if (this.columnsHeight[columnPosition - 1 + i] > this.columnsHeight[columnPosition - 1]) {
-                            isFitting = false;
-                        } else {
-                            isFitting = true;
-                            startingColumnPosition = columnPosition - 1;
+                    if (cardColSpan > 1) {
+                        // one column is at columnPosition. check rest card width also fit at this height.
+                        for (let i = cardColSpan - 1; i > 0 && !isFitting; i--) {
+                            if (this.columnsHeight[columnPosition - 1 + i] > this.columnsHeight[columnPosition - 1]) {
+                                isFitting = false;
+                            } else {
+                                isFitting = true;
+                                startingColumnPosition = columnPosition - 1;
 
-                            // is whole width of card will fit
-                            for (let columnIndex = 0; columnIndex < cardColSpan; columnIndex++) {
-                                if (
-                                    this.columnsHeight[columnIndex + startingColumnPosition] >
-                                    this.columnsHeight[columnPosition - 1]
-                                ) {
-                                    // not full width is fitting
-                                    isFitting = false;
-                                    startingColumnPosition = -1;
+                                // is whole width of card will fit
+                                for (let columnIndex = 0; columnIndex < cardColSpan; columnIndex++) {
+                                    if (
+                                        this.columnsHeight[columnIndex + startingColumnPosition] >
+                                        this.columnsHeight[columnPosition - 1]
+                                    ) {
+                                        // not full width is fitting
+                                        isFitting = false;
+                                        startingColumnPosition = -1;
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        isFitting = true;
+                        startingColumnPosition = columnPosition - 1;
                     }
                 }
             }
