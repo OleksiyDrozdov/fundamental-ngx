@@ -1,178 +1,152 @@
-<div style="width: 1280px; height: 900px;">
-    <fd-resizable-card-layout [layoutConfig]="layoutConfig">
-        <fd-card *fdRsCardDef="1">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 1</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
+<fd-segmented-button [(ngModel)]="layoutSize" (ngModelChange)="openDialog(dialogTemplate)">
+    <button fd-button value="xl">XLarge Screen</button>
+    <button fd-button value="lg">Large Screen</button>
+    <button fd-button value="md">Medium Screen</button>
+    <button fd-button value="sm">Small Screen</button>
+</fd-segmented-button>
 
-        <fd-card *fdRsCardDef="2">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 2</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
+<ng-template let-dialog let-dialogConfig="dialogConfig" #dialogTemplate>
+    <fd-dialog [dialogConfig]="dialogConfig" [dialogRef]="dialog">
+        <fd-dialog-header>
+            <h1 fd-title>Resizable card layout</h1>
+            <button fd-dialog-close-button (click)="dialog.dismiss('Close button')"></button>
+        </fd-dialog-header>
 
-        <fd-card *fdRsCardDef="3">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 3</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
+        <fd-dialog-body>
+            <fd-resizable-card-layout [layoutConfig]="layoutConfig" [layoutSize]="layoutSize">
+                <fd-card *fdRsCardDef="1">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 1</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
 
-        <fd-card *fdRsCardDef="4">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 4</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
+                <fd-card *fdRsCardDef="2">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 2</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
 
-        <fd-card *fdRsCardDef="5">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 5</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
+                <fd-card *fdRsCardDef="3">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 3</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
 
-        <fd-card *fdRsCardDef="6">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 6</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
+                <fd-card *fdRsCardDef="4">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 4</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
 
-        <fd-card *fdRsCardDef="7">
-            <fd-card-header>
-                <h2 fd-card-title>Card Title 7</h2>
-            </fd-card-header>
-            <fd-card-content>
-                <ul fd-list [noBorder]="true">
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 1
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 2
-                        </span>
-                    </li>
-                    <li fd-list-item>
-                        <span fd-list-title>
-                            item 3
-                        </span>
-                    </li>
-                </ul>
-            </fd-card-content>
-        </fd-card>
-    </fd-resizable-card-layout>
-</div>
+                <fd-card *fdRsCardDef="5">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 5</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
+
+                <fd-card *fdRsCardDef="6">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 6</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
+
+                <fd-card *fdRsCardDef="7">
+                    <fd-card-header>
+                        <h2 fd-card-title>Card Title 7</h2>
+                    </fd-card-header>
+                    <fd-card-content>
+                        <ul fd-list [noBorder]="true">
+                            <li fd-list-item>
+                                <span fd-list-title> item 1 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 2 </span>
+                            </li>
+                            <li fd-list-item>
+                                <span fd-list-title> item 3 </span>
+                            </li>
+                        </ul>
+                    </fd-card-content>
+                </fd-card>
+            </fd-resizable-card-layout>
+        </fd-dialog-body>
+    </fd-dialog>
+</ng-template>
