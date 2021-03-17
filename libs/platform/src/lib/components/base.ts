@@ -58,6 +58,7 @@ export abstract class BaseComponent {
         this._disabled = disabled;
     }
 
+    /**@hidden */
     constructor(protected _cd: ChangeDetectorRef) {}
 
     /**

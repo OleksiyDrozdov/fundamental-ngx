@@ -35,7 +35,7 @@
         [disabled]="disabled"
         [compact]="contentDensity === 'compact'"
         (keydown)="removeSelectedTokens($event)"
-        (addOnButtonClicked)="!mobile && onPrimaryButtonClick(_connectedOverlay.open)"
+        (addOnButtonClicked)="!mobile && addOnButtonClick()"
         (click)="mobile && onPrimaryButtonClick(false)"
     >
         <fd-tokenizer
@@ -51,6 +51,7 @@
             <input
                 #searchInputElement
                 type="text"
+                [compact]="contentDensity === 'compact'"
                 (focusin)="tokenizer.inputFocused = true"
                 (focusout)="tokenizer.inputFocused = false"
                 class="fd-input fd-tokenizer__input fd-multi-input-tokenizer-input"
@@ -67,6 +68,9 @@
                 [attr.aria-expanded]="isOpen && _suggestions.length > 0"
                 [readonly]="readonly"
                 [attr.aria-readonly]="readonly"
+                [attr.aria-label]="ariaLabel"
+                [attr.aria-labelledby]="ariaLabelledBy"
+                autofocus="autofocus"
             />
         </fd-tokenizer>
     </fd-input-group>
@@ -79,6 +83,7 @@
         [selectionMode]="selectionMode"
         [contentDensity]="contentDensity"
         *ngIf="_suggestions && _suggestions.length"
+        [navigated]="true"
     >
         <ng-container *ngIf="!isGroup">
             <fdp-standard-list-item
