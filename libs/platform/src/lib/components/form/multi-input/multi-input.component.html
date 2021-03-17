@@ -52,8 +52,8 @@
                 #searchInputElement
                 type="text"
                 [compact]="contentDensity === 'compact'"
-                (focusin)="tokenizer.inputFocused = true"
-                (focusout)="tokenizer.inputFocused = false"
+                (focusin)="onFocusChange(true)"
+                (focusout)="onFocusChange(false)"
                 class="fd-input fd-tokenizer__input fd-multi-input-tokenizer-input"
                 fdp-auto-complete
                 [inputText]="inputText"

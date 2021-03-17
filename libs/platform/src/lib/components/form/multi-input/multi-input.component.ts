@@ -1,15 +1,13 @@
 import { Direction } from '@angular/cdk/bidi';
-import { BACKSPACE, DELETE, DOWN_ARROW, ENTER, LEFT_ARROW, RIGHT_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
+import { DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 import {
     ChangeDetectionStrategy,
     Component,
     ViewEncapsulation,
     ViewChild,
-    EventEmitter,
     forwardRef,
     Input,
-    Output,
     OnInit,
     AfterViewInit,
     ChangeDetectorRef,
@@ -33,7 +31,7 @@ import { ListComponent, SelectionType } from '../../list/list.component';
 import { ListConfig } from '../../list/list.config';
 import { FormFieldControl, Status } from '../form-control';
 import { FormField } from '../form-field';
-import { InputGroupAddonComponent } from '../input-group/addon.component';
+
 import { InputType } from '../input/input.component';
 import { BaseMultiInput } from './base-multi-input';
 import { PlatformMultiInputMobileComponent } from './multi-input-mobile/multi-input-mobile.component';
@@ -109,9 +107,6 @@ export class PlatformMultiInputComponent extends BaseMultiInput implements OnIni
     @ViewChild(TokenizerComponent)
     tokenizer: TokenizerComponent;
 
-    @ViewChild(InputGroupAddonComponent)
-    inputGroupAddOn: InputGroupAddonComponent;
-
     /** @hidden */
     @ViewChild('controlTemplate')
     controlTemplate: TemplateRef<any>;
@@ -165,6 +160,13 @@ export class PlatformMultiInputComponent extends BaseMultiInput implements OnIni
         // if we have both prefer dataSource
         if (!this.dataSource && this.entityClass && providers.has(this.entityClass)) {
             this.dataSource = new ListDataSource(providers.get(this.entityClass));
+        }
+    }
+
+    /**hidden */
+    onFocusChange(focusIn: boolean): void {
+        if (this.tokenizer) {
+            this.tokenizer.inputFocused = focusIn;
         }
     }
 
@@ -242,6 +244,7 @@ export class PlatformMultiInputComponent extends BaseMultiInput implements OnIni
     /** @hidden */
     removeToken(token): void {
         this.selected.splice(this.selected.indexOf(token), 1);
+        this.searchInputElement.nativeElement.focus();
         this._updateModel(this.selected);
     }
 
