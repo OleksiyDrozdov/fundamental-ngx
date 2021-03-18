@@ -41,7 +41,7 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     set config(config: ResizableCardItemConfig) {
         this._config = config;
-        // this._initialSetup();
+        this._initialSetup();
         this._changeDetectorRef.detectChanges();
     }
 
@@ -250,6 +250,7 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
         }
 
         this._stopResizing();
+        this._changeDetectorRef.detectChanges();
     }
 
     /** Sets focus on the element */
@@ -308,13 +309,13 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     /** @hidden Set card properties using config received */
     private _initialSetup(): void {
-        this.cardWidth = this._config.cardWidth || this.cardWidth;
-        this.cardHeight = this._config.cardHeight || this.cardHeight;
-        this.title = this._config.title || this.title;
-        this.rank = this._config.rank || this.rank;
-        this.miniHeaderHeight = this._config.miniHeaderHeight || this.miniHeaderHeight;
-        this.miniContentHeight = this._config.miniContentHeight || this.miniContentHeight;
-        this.resizable = this.resizable || this._config.resizable;
+        this.cardWidth = this._config?.cardWidth || this.cardWidth;
+        this.cardHeight = this._config?.cardHeight || this.cardHeight;
+        this.title = this._config?.title || this.title;
+        this.rank = this._config?.rank || this.rank;
+        this.miniHeaderHeight = this._config?.miniHeaderHeight || this.miniHeaderHeight;
+        this.miniContentHeight = this._config?.miniContentHeight || this.miniContentHeight;
+        this.resizable = this._config.resizable || this.resizable;
     }
 
     /**
@@ -363,8 +364,11 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
      */
     private _horizontalResizing(xPosition: number): void {
         this.cardWidth = this.cardWidth - (this._prevX - xPosition);
+
         if (this.cardWidth > this._maxCardWidth) {
             this.cardWidth = this._maxCardWidth;
+        } else if (this.cardWidth < HorizontalResizeStep) {
+            this.cardWidth = HorizontalResizeStep;
         }
     }
 

@@ -4,6 +4,7 @@ import { Component, QueryList, ViewChildren } from '@angular/core';
 
 import { ResizableCardItemComponent } from './resizable-card-item.component';
 import { CardModule } from '../../card/card.module';
+import { IconModule } from '../../icon/icon.module';
 
 @Component({
     template: `
@@ -34,7 +35,7 @@ describe('ResizableCardItemComponent', () => {
         waitForAsync(() => {
             TestBed.configureTestingModule({
                 declarations: [ResizableCardItemComponent, TestResizableCardItemComponent],
-                imports: [CommonModule, CardModule]
+                imports: [CommonModule, CardModule, IconModule]
             }).compileComponents();
         })
     );
@@ -58,10 +59,10 @@ describe('ResizableCardItemComponent', () => {
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
 
+        fixture.detectChanges();
+
         expect(card.cardWidth).toEqual(640);
         expect(card.cardHeight).toEqual(432);
-
-        fixture.detectChanges();
     });
 
     it('should decrease width in step of 20 rem and height in step of 1rem', () => {
@@ -73,10 +74,10 @@ describe('ResizableCardItemComponent', () => {
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
 
+        fixture.detectChanges();
+
         expect(card.cardWidth).toEqual(320);
         expect(card.cardHeight).toEqual(256);
-
-        fixture.detectChanges();
     });
 
     it('should emit resized event when resizing is completed', () => {
@@ -88,6 +89,7 @@ describe('ResizableCardItemComponent', () => {
         const mouseEvent2 = new MouseEvent('resize', { clientX: 100, clientY: 20 });
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
+
         fixture.detectChanges();
         expect(cardResized).toHaveBeenCalled();
     });
@@ -101,6 +103,7 @@ describe('ResizableCardItemComponent', () => {
         const mouseEvent2 = new MouseEvent('resize', { clientX: 600, clientY: 40 });
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
+
         fixture.detectChanges();
 
         expect(card.cardWidth).toEqual(1280);
@@ -117,6 +120,7 @@ describe('ResizableCardItemComponent', () => {
         const mouseEvent2 = new MouseEvent('resize', { clientX: 200, clientY: 60 });
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
+
         fixture.detectChanges();
 
         expect(card.cardWidth).toEqual(640);
@@ -133,6 +137,7 @@ describe('ResizableCardItemComponent', () => {
         const mouseEvent2 = new MouseEvent('resize', { clientX: 100, clientY: 40 });
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
+
         fixture.detectChanges();
 
         expect(card.cardWidth).toEqual(320);
@@ -149,6 +154,7 @@ describe('ResizableCardItemComponent', () => {
         const mouseEvent2 = new MouseEvent('resize', { clientX: 200, clientY: 20 });
         card.onMouseMove(mouseEvent2);
         card.onMouseUp(mouseEvent2);
+
         fixture.detectChanges();
 
         expect(card.cardWidth).toEqual(640);
@@ -162,6 +168,8 @@ describe('ResizableCardItemComponent', () => {
 
         const layoutSize = 'sm';
         card.verifyUpdateCardWidth(layoutSize);
+        fixture.detectChanges();
+
         expect(card.cardWidth).toEqual(320);
     });
 
@@ -171,6 +179,8 @@ describe('ResizableCardItemComponent', () => {
 
         const layoutSize = 'md';
         card.verifyUpdateCardWidth(layoutSize);
+        fixture.detectChanges();
+
         expect(card.cardWidth).toEqual(640);
     });
 
@@ -180,6 +190,8 @@ describe('ResizableCardItemComponent', () => {
 
         const layoutSize = 'lg';
         card.verifyUpdateCardWidth(layoutSize);
+        fixture.detectChanges();
+
         expect(card.cardWidth).toEqual(960);
     });
 
@@ -189,6 +201,8 @@ describe('ResizableCardItemComponent', () => {
 
         const layoutSize = 'xl';
         card.verifyUpdateCardWidth(layoutSize);
+        fixture.detectChanges();
+
         expect(card.cardWidth).toEqual(1280);
     });
 });
