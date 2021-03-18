@@ -1,24 +1,24 @@
 import {
+    AfterContentInit,
     AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
-    Directive,
     ElementRef,
     EventEmitter,
     HostListener,
     Input,
+    OnDestroy,
     OnInit,
     Output,
     QueryList,
-    TemplateRef,
     ViewChild,
-    ViewChildren,
-    ViewContainerRef,
     ViewEncapsulation
 } from '@angular/core';
 import { FocusKeyManager } from '@angular/cdk/a11y';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 import {
     CardDropped,
@@ -29,23 +29,9 @@ import {
     ResizableCardItemConfig
 } from './resizable-card-item/resizable-card-item.component';
 
-let cardRank = 1;
 const DRAG_START_DELAY = 500;
 export type LayoutSize = 'sm' | 'md' | 'lg' | 'xl';
 export type ResizableCardLayoutConfig = Array<ResizableCardItemConfig>;
-
-@Directive({ selector: '[fdRsCardDef]' })
-export class ResizableCardDefinitionDirective implements OnInit {
-    // rank of card
-    @Input()
-    fdRsCardDef: number = cardRank++;
-
-    constructor(public template: TemplateRef<any>, public container: ViewContainerRef) {}
-
-    ngOnInit(): void {
-        this.container.createEmbeddedView(this.template);
-    }
-}
 
 @Component({
     selector: 'fd-resizable-card-layout',
@@ -54,7 +40,7 @@ export class ResizableCardDefinitionDirective implements OnInit {
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None
 })
-export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
+export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, AfterContentInit, OnDestroy {
     /** Drag of card can be disabled. Default is true */
     @Input()
     draggable = true;
@@ -82,6 +68,14 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
     @Output()
     dropped: EventEmitter<CardDropped> = new EventEmitter<CardDropped>();
 
+    /** Emits when card is still resizing */
+    @Output()
+    resizing: EventEmitter<ResizingEvent> = new EventEmitter<ResizingEvent>();
+
+    /** Emits when card resize is completed */
+    @Output()
+    resized: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
+
     /** Emits when card height is reduced to show only header */
     @Output()
     miniHeaderReached: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
@@ -90,12 +84,16 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
     @Output()
     miniContentReached: EventEmitter<ResizedEvent> = new EventEmitter<ResizedEvent>();
 
-    /** @hidden */
-    @ContentChildren(ResizableCardDefinitionDirective)
-    resizeCardDirectives: QueryList<ResizableCardDefinitionDirective>;
+    /** Emits when layout changes */
+    @Output()
+    layoutChange: EventEmitter<ResizableCardLayoutConfig> = new EventEmitter<ResizableCardLayoutConfig>();
 
     /** @hidden */
-    @ViewChildren(ResizableCardItemComponent)
+    // @ViewChildren(ResizableCardItemComponent)
+    // resizeCardItems: QueryList<ResizableCardItemComponent>;
+
+    /** @hidden */
+    @ContentChildren(ResizableCardItemComponent)
     resizeCardItems: QueryList<ResizableCardItemComponent>;
 
     /** @hidden */
@@ -119,7 +117,10 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
     /** @hidden FocusKeyManager instance */
     private _keyboardEventsManager: FocusKeyManager<ResizableCardItemComponent>;
 
-    constructor(private _changeDetectorRef: ChangeDetectorRef) {}
+    /** @hidden  */
+    private destroy$ = new Subject<boolean>();
+
+    constructor(private readonly _changeDetectorRef: ChangeDetectorRef, private readonly _elementRef: ElementRef) {}
 
     /** @hidden */
     ngOnInit(): void {
@@ -128,10 +129,21 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
     }
 
     /** @hidden */
+    ngAfterContentInit(): void {
+        this._initialSetup();
+        this.arrangeCards(this.resizeCardItems?.toArray());
+    }
+
+    /** @hidden */
     ngAfterViewInit(): void {
         this._accessibilitySetup();
-        this.arrangeCards(this.resizeCardItems.toArray());
         this._changeDetectorRef.detectChanges();
+    }
+
+    /** @hidden */
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     /** @hidden */
@@ -164,7 +176,9 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
      * Handles shifting of cards with animation
      * while card is still resizing
      */
-    cardResizing(event: ResizingEvent): void {}
+    cardResizing(event: ResizingEvent): void {
+        this.resizing.emit(event);
+    }
 
     /**
      * Handles arrangement of cards in layout
@@ -172,11 +186,61 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
     cardResizeComplete(event: ResizedEvent): void {
         this._initHeightArray();
         this.arrangeCards(this.resizeCardItems.toArray());
+        this._emitLayoutChange();
+        this.resized.emit(event);
+    }
+
+    /** @hidden */
+    elementRef(): ElementRef<ResizableCardLayoutComponent> {
+        return this._elementRef;
+    }
+
+    /** @hidden Subscribe to events from items */
+    private _initialSetup(): void {
+        // listen for resizing event of card item
+        this.resizeCardItems.forEach((resizeCardItem) => {
+            resizeCardItem.resizing
+                .pipe(takeUntil(this.destroy$))
+                .subscribe((event: ResizingEvent) => this.cardResizing(event));
+
+            // listen for resize complete event of card item
+            resizeCardItem.resized
+                .pipe(takeUntil(this.destroy$))
+                .subscribe((event: ResizedEvent) => this.cardResizeComplete(event));
+
+            // listen for mini-header height event of card item
+            resizeCardItem.miniHeaderReached.pipe(takeUntil(this.destroy$)).subscribe((event: ResizedEvent) => {
+                this.miniHeaderReached.emit(event);
+            });
+
+            // listen for mini-content height event of card item
+            resizeCardItem.miniContentReached.pipe(takeUntil(this.destroy$)).subscribe((event: ResizedEvent) => {
+                this.miniContentReached.emit(event);
+            });
+
+            // listen for step-change event of card item
+            resizeCardItem.stepChange.pipe(takeUntil(this.destroy$)).subscribe((event: ResizedEvent) => {
+                this.stepChange.emit(event);
+            });
+        });
     }
 
     /** @hidden */
     private _accessibilitySetup(): void {
         this._keyboardEventsManager = new FocusKeyManager(this.resizeCardItems).withWrap();
+    }
+
+    /** Emit layoutChange event with updated card dimensions */
+    private _emitLayoutChange(): void {
+        const latestCardConfig: ResizableCardLayoutConfig = [];
+        this.resizeCardItems.forEach((card) => {
+            const cardConfig: ResizableCardItemConfig = {};
+            cardConfig.cardWidth = card.cardWidth;
+            cardConfig.cardHeight = card.cardHeight;
+            cardConfig.rank = card.rank;
+            latestCardConfig.push(cardConfig);
+        });
+        this.layoutChange.emit(latestCardConfig);
     }
 
     /** @hidden Sets number of column in layout, based on LayoutSize passed */
@@ -229,6 +293,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
         if (index === 0) {
             card.left = 0;
             card.top = 0;
+            card.startingColumnPosition = 0;
             return;
         }
 
@@ -263,7 +328,6 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
 
         // try to fit as left as possible from the column position
         startingColumnPosition = this._fitLeftFromColumnPosition(card, columnPositions);
-
         // if not moving towards left. start from column position and check if fits.
         // try to set towards right from available card position
         if (startingColumnPosition === -1) {
@@ -274,6 +338,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit {
             isFitting = true;
             card.left = startingColumnPosition * HorizontalResizeStep;
             card.top = height;
+            card.startingColumnPosition = startingColumnPosition;
         }
         return isFitting;
     }

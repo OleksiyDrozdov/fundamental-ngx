@@ -41,7 +41,7 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     set config(config: ResizableCardItemConfig) {
         this._config = config;
-        this._initialSetup();
+        // this._initialSetup();
         this._changeDetectorRef.detectChanges();
     }
 
@@ -129,6 +129,9 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
     /** show border when card is resizing */
     showBorder = false;
 
+    /** starting column position of card */
+    startingColumnPosition: number;
+
     /** @hidden Helps in emitting resizing event at a given interval */
     private _resizeDebounce$: Subject<PositionChange> = new Subject<PositionChange>();
 
@@ -142,8 +145,9 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
     /** @hidden flag to control resize */
     private _resize = false;
     private _resizeDirection: ResizeDirection;
+    private _maxCardWidth: number;
 
-    constructor(private _changeDetectorRef: ChangeDetectorRef, private _elementRef: ElementRef) {}
+    constructor(private readonly _changeDetectorRef: ChangeDetectorRef, private readonly _elementRef: ElementRef) {}
 
     /** @hidden */
     ngOnInit(): void {
@@ -163,8 +167,12 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
      * @param event: MouseEvent
      * @param resizeDirection: which handler is pressed to resize
      */
-    startResizing(event: MouseEvent, resizeDirection: ResizeDirection): void {
+    onMouseDown(event: MouseEvent, resizeDirection: ResizeDirection): void {
         event.preventDefault();
+        if (!this.resizable) {
+            return;
+        }
+
         this.showBorder = true;
         this.showingResizeIcon = true;
         this._resize = true;
@@ -177,12 +185,16 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     /**
      * When mouse moves to resize the card.
+     * using window:mousemove so, resize will happen smoothly
      * @param event: MouseEvent
      */
     @HostListener('window:mousemove', ['$event'])
-    resizingCard(event: MouseEvent): void {
+    onMouseMove(event: MouseEvent): void {
         event.preventDefault();
-        // using window:mousemove so, resize will happen smoothly
+        if (!this.resizable) {
+            return;
+        }
+
         if (!this._resize) {
             return;
         }
@@ -191,10 +203,10 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
         this.zIndex = 1;
 
         if (this._resizeDirection === 'both') {
-            this.cardWidth = this.cardWidth - (this._prevX - event.clientX);
+            this._horizontalResizing(event.clientX);
             this._verticalResizing(event.clientY);
         } else if (this._resizeDirection === 'horizontal') {
-            this.cardWidth = this.cardWidth - (this._prevX - event.clientX);
+            this._horizontalResizing(event.clientX);
         } else {
             this._verticalResizing(event.clientY);
         }
@@ -221,14 +233,19 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
      * when resizing of card stops
      * @param event: MouseEvent
      */
-    stopResizing(event: MouseEvent): void {
+    @HostListener('document: mouseup', ['$event'])
+    onMouseUp(event: MouseEvent): void {
+        if (!this.resizable) {
+            return;
+        }
+
         // increase/decrease width of card in order of 20rem
         if (Math.abs(this.cardWidth - this._prevCardWidth) > 0) {
             this._horizontalStepResizing();
         }
 
         // increase/decrease height of card in order of 1rem
-        if (Math.abs(this.cardWidth - this._prevCardHeight) > 0) {
+        if (Math.abs(this.cardHeight - this._prevCardHeight) > 0) {
             this._verticalStepResizing();
         }
 
@@ -251,13 +268,6 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
         // TODO: make it false. currently having bug.
     }
 
-    /** Stop card resize on click */
-    stopCardResizing(): void {
-        if (this._resize) {
-            this._stopResizing();
-        }
-    }
-
     /** Returns max width for card, based on layout size passed */
     getMaxCardWidth(layoutSize: string): number {
         let maxCardWidth: number;
@@ -268,7 +278,7 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
                 break;
             case 'md':
                 // two column span max-width
-                maxCardWidth = 720;
+                maxCardWidth = 640;
                 break;
             case 'lg':
                 // three column span max-width
@@ -284,11 +294,16 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     /** Update card width if it exceeds column span based on layout */
     verifyUpdateCardWidth(layoutSize: string): void {
-        const width = this._config.cardWidth || this.cardWidth;
-        const maxWidth = this.getMaxCardWidth(layoutSize);
-        if (width > maxWidth) {
-            this.cardWidth = maxWidth;
+        const width = this._config?.cardWidth || this.cardWidth;
+        this._maxCardWidth = this.getMaxCardWidth(layoutSize);
+        if (width > this._maxCardWidth) {
+            this.cardWidth = this._maxCardWidth;
         }
+    }
+
+    /** @hidden */
+    elementRef(): ElementRef<ResizableCardItemComponent> {
+        return this._elementRef;
     }
 
     /** @hidden Set card properties using config received */
@@ -340,6 +355,17 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
         }
 
         this.stepChange.emit(this._getResizedEventObject());
+    }
+
+    /**
+     * @hidden Resize card horizontally by checking boundary condition
+     * @param xPosition: current x-position of cursor
+     */
+    private _horizontalResizing(xPosition: number): void {
+        this.cardWidth = this.cardWidth - (this._prevX - xPosition);
+        if (this.cardWidth > this._maxCardWidth) {
+            this.cardWidth = this._maxCardWidth;
+        }
     }
 
     /**

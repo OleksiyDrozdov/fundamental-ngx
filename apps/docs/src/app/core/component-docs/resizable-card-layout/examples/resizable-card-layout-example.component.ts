@@ -16,7 +16,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
         this.layoutConfig = [
             {
                 title: 'card1',
-                rank: 1,
+                rank: 2,
                 cardWidth: 320,
                 cardHeight: 400,
                 miniHeaderHeight: 80,
@@ -25,7 +25,7 @@ export class ResizableCardLayoutExampleComponent implements OnInit {
             },
             {
                 title: 'card2',
-                rank: 2,
+                rank: 1,
                 cardWidth: 320,
                 cardHeight: 300,
                 miniHeaderHeight: 80,

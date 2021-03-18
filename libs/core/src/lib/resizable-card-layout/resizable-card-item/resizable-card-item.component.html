@@ -1,13 +1,13 @@
 <div tabindex="0" class="fd-resizable-card-layout__item" [class.fd-resizable-card-layout__indication-border]="false"
     [style.width.px]="cardWidth" [style.height.px]="cardHeight" (mouseover)="showResizeIcon($event)"
-    (mouseout)="hideResizeIcon($event)" #resizeCard (click)="stopCardResizing()">
+    (mouseout)="hideResizeIcon($event)" #resizeCard>
     <div class="fd-resizable-card-layout__card">
         <ng-content></ng-content>
 
         <ng-container *ngIf="showingResizeIcon">
             <div class="fd-resizable-card-layout__icon-wrapper">
-                <div class="fd-resizable-card-layout__icon" #cornerHandle (mousedown)="startResizing($event, 'both')"
-                    (mouseup)="stopResizing($event)"></div>
+                <div class="fd-resizable-card-layout__icon" #cornerHandle (mousedown)="onMouseDown($event, 'both')">
+                </div>
             </div>
         </ng-container>
     </div>
@@ -19,10 +19,10 @@
 
 <ng-template #verticalHandleTpt>
     <div #verticalHandle class="fd-resizable-card-layout__resize--vertical"
-        (mousedown)="startResizing($event, 'horizontal')" (mouseup)="stopResizing($event)"></div>
+        (mousedown)="onMouseDown($event, 'horizontal')"></div>
 </ng-template>
 
 <ng-template #horizontalHandleTpt>
     <div #horizontalHandle class="fd-resizable-card-layout__resize--horizontal"
-        (mousedown)="startResizing($event, 'vertical')" (mouseup)="stopResizing($event)"></div>
+        (mousedown)="onMouseDown($event, 'vertical')"></div>
 </ng-template>
