@@ -265,8 +265,9 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     /** Hides resize icon */
     hideResizeIcon(event: MouseEvent): void {
-        // this.showingResizeIcon = false;
-        // TODO: make it false. currently having bug.
+        if (!this._resize) {
+            this.showingResizeIcon = false;
+        }
     }
 
     /** Returns max width for card, based on layout size passed */
@@ -305,6 +306,14 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
     /** @hidden */
     elementRef(): ElementRef<ResizableCardItemComponent> {
         return this._elementRef;
+    }
+
+    markForCheck(): void {
+        this._changeDetectorRef.markForCheck();
+    }
+
+    detectChanges(): void {
+        this._changeDetectorRef.detectChanges();
     }
 
     /** @hidden Set card properties using config received */
@@ -417,10 +426,12 @@ export class ResizableCardItemComponent implements OnInit, OnDestroy, FocusableO
 
     /** @hidden reset involved variables while resizing */
     private _stopResizing(): void {
-        this._resize = false;
-        this.zIndex = 0;
-        this.showBorder = false;
-        this.resized.emit(this._getResizedEventObject());
+        if (this._resize) {
+            this._resize = false;
+            this.zIndex = 0;
+            this.showBorder = false;
+            this.resized.emit(this._getResizedEventObject());
+        }
     }
 
     /**

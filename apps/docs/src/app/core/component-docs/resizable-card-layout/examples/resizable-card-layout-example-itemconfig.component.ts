@@ -4,6 +4,7 @@ import { DialogService, ResizableCardLayoutConfig, LayoutSize } from '@fundament
 @Component({
     selector: 'fd-resizable-card-layout-example-itemconfig',
     templateUrl: './resizable-card-layout-example-itemconfig.component.html',
+    styleUrls: ['./resizable-card-layout-example-itemconfig.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResizableCardLayoutExampleItemConfigComponent implements OnInit {
@@ -16,7 +17,7 @@ export class ResizableCardLayoutExampleItemConfigComponent implements OnInit {
         this.layoutConfig = [
             {
                 title: 'card1',
-                rank: 2,
+                rank: 1,
                 cardWidth: 320,
                 cardHeight: 400,
                 miniHeaderHeight: 80,
@@ -25,7 +26,7 @@ export class ResizableCardLayoutExampleItemConfigComponent implements OnInit {
             },
             {
                 title: 'card2',
-                rank: 1,
+                rank: 2,
                 cardWidth: 320,
                 cardHeight: 300,
                 miniHeaderHeight: 80,
@@ -108,9 +109,7 @@ export class ResizableCardLayoutExampleItemConfigComponent implements OnInit {
     private _setUpDialog(dialogTemplate: TemplateRef<any>, width: string, height: string): void {
         this._dialogService.open(dialogTemplate, {
             mobile: true,
-            verticalPadding: true,
-            width: width,
-            height: height
+            verticalPadding: true
         });
     }
 }

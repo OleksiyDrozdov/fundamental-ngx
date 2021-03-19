@@ -97,13 +97,18 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     resizeCardItems: QueryList<ResizableCardItemComponent>;
 
     /** @hidden */
-    @ViewChild('layout')
-    layoutWidth: ElementRef;
+    layoutWidth: number;
+
+    /** @hidden */
+    layoutHeight: number;
 
     dragStartDelay = DRAG_START_DELAY;
 
     /** @hidden Number of columns in layout. considering 1 column width 20rem */
     private _columns: number;
+
+    /** @hidden Layout padding. will be added to first card padding in every row */
+    private _paddingLeft: number;
 
     /** @hidden Stores height of each column on card arrangement */
     private _columnsHeight: Array<number>;
@@ -131,6 +136,10 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
     /** @hidden */
     ngAfterContentInit(): void {
         this._initialSetup();
+        // listen for query-list change
+        this.resizeCardItems.changes.subscribe(() => {
+            this.arrangeCards(this.resizeCardItems?.toArray());
+        });
         this.arrangeCards(this.resizeCardItems?.toArray());
     }
 
@@ -167,8 +176,11 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         this._sortedCards.forEach((card, index) => {
             card.verifyUpdateCardWidth(this.layoutSize);
             this._setCardPositionValues(card, index);
+            card.markForCheck();
+
             this._updateColumnsHeight(card);
         });
+        this.layoutHeight = Math.max.apply(null, this._columnsHeight);
         this._changeDetectorRef.detectChanges();
     }
 
@@ -252,18 +264,27 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
         switch (layoutSize) {
             case 'sm':
                 this._columns = 1;
+                this._paddingLeft = 0;
+                this.layoutWidth = this._columns * HorizontalResizeStep + 2 * this._paddingLeft;
                 break;
             case 'md':
                 this._columns = 2;
+                this._paddingLeft = 8;
+                this.layoutWidth = this._columns * HorizontalResizeStep + 2 * this._paddingLeft;
                 break;
             case 'lg':
                 this._columns = 3;
+                this._paddingLeft = 8;
+                this.layoutWidth = this._columns * HorizontalResizeStep + 2 * this._paddingLeft;
                 break;
             case 'xl':
                 this._columns = 4;
+                this._paddingLeft = 40;
+                this.layoutWidth = this._columns * HorizontalResizeStep + 2 * this._paddingLeft;
                 break;
             default:
                 this._columns = 4;
+                this._paddingLeft = 40;
         }
         this._changeDetectorRef.detectChanges();
     }
@@ -296,7 +317,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
      */
     private _setCardPositionValues(card: ResizableCardItemComponent, index: number): void {
         if (index === 0) {
-            card.left = 0;
+            card.left = 0 + this._paddingLeft;
             card.top = 0;
             card.startingColumnPosition = 0;
             return;
@@ -340,7 +361,7 @@ export class ResizableCardLayoutComponent implements OnInit, AfterViewInit, Afte
 
         if (startingColumnPosition !== -1) {
             isFitting = true;
-            card.left = startingColumnPosition * HorizontalResizeStep;
+            card.left = startingColumnPosition * HorizontalResizeStep + this._paddingLeft;
             card.top = height;
             card.startingColumnPosition = startingColumnPosition;
         }

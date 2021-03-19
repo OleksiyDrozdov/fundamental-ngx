@@ -4,6 +4,7 @@ import { DialogService, ResizableCardLayoutConfig, LayoutSize } from '@fundament
 @Component({
     selector: 'fd-resizable-card-layout-example-layoutconfig',
     templateUrl: './resizable-card-layout-example-layoutconfig.component.html',
+    styleUrls: ['./resizable-card-layout-example-layoutconfig.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResizableCardLayoutExampleLayoutConfigComponent implements OnInit {
@@ -16,7 +17,7 @@ export class ResizableCardLayoutExampleLayoutConfigComponent implements OnInit {
         this.layoutConfig = [
             {
                 title: 'card1',
-                rank: 2,
+                rank: 1,
                 cardWidth: 320,
                 cardHeight: 400,
                 miniHeaderHeight: 80,
@@ -25,7 +26,7 @@ export class ResizableCardLayoutExampleLayoutConfigComponent implements OnInit {
             },
             {
                 title: 'card2',
-                rank: 1,
+                rank: 2,
                 cardWidth: 320,
                 cardHeight: 300,
                 miniHeaderHeight: 80,
@@ -81,36 +82,9 @@ export class ResizableCardLayoutExampleLayoutConfigComponent implements OnInit {
     }
 
     openDialog(dialogTemplate: TemplateRef<any>): void {
-        let width: string;
-        let height: string;
-
-        switch (this.layoutSize) {
-            case 'sm':
-                width = '320px';
-                height = '900px';
-                break;
-            case 'md':
-                width = '672px';
-                height = '900px';
-                break;
-            case 'lg':
-                width = '960px';
-                height = '900px';
-                break;
-            case 'xl':
-                width = '1280px';
-                height = '900px';
-                break;
-        }
-        this._setUpDialog(dialogTemplate, width, height);
-    }
-
-    private _setUpDialog(dialogTemplate: TemplateRef<any>, width: string, height: string): void {
         this._dialogService.open(dialogTemplate, {
             mobile: true,
-            verticalPadding: true,
-            width: width,
-            height: height
+            verticalPadding: true
         });
     }
 }

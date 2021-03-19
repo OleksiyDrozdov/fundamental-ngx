@@ -3,3 +3,13 @@
 .fd-resizable-card-layout {
     position: relative;
 }
+
+.fd-resizable-card-layout--lg {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+.fd-resizable-card-layout--xl {
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+}
