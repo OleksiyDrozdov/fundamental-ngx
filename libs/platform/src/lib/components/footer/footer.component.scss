@@ -25,54 +25,67 @@ $fd-footer-font-size: var(--sapFontSize, 0.875rem);
         }
     }
 }
+@media (min-width: 1440px) {
+    .fdp-footer {
+        @include fd-reset();
+        &--container {
+            display: flex;
+            width: 100%;
+            padding-top: 0.75rem;
+        }
 
-.fdp-footer {
-    @include fd-reset();
+        width: 100%;
+        background-color: var(--sapField_Background);
+        display: inline-block;
+        padding: 1.5rem 3rem 2rem 3rem;
 
-    width: 100%;
-    background-color: var(--sapField_Background);
-    display: inline-block;
-    padding: 1.5rem 3rem 2rem 3rem;
+        &--logo {
+            width: 3rem;
+            height: 1.5rem;
+            overflow: hidden;
+        }
+        &--link {
+            color: $fd-link-font-color;
+            font-family: var(--sapFontFamily, '72', '72full', Arial, Helvetica, sans-serif);
+            font-size: 0.875rem;
+            display: inline;
 
-    &--logo {
-        width: 3rem;
-        height: 1.5rem;
-        overflow: hidden;
-    }
-    &--link {
-        color: $fd-link-font-color;
-        font-family: var(--sapFontFamily, '72', '72full', Arial, Helvetica, sans-serif);
-        font-size: 0.875rem;
-        display: inherit;
-        padding-top: 0.75rem;
-        width: 73%;
-        > div > * {
-            margin-right: 1.5rem;
-            @include fd-rtl() {
-                margin-left: 1.5rem;
-                margin-right: 0rem;
+            width: 75%;
+            > div > * {
+                margin-right: 1.5rem;
+                @include fd-rtl() {
+                    margin-left: 1.5rem;
+                    margin-right: 0rem;
+                }
+            }
+            > * {
+                margin-right: 1.5rem;
+                @include fd-rtl() {
+                    margin-left: 1.5rem;
+                    margin-right: 0rem;
+                }
             }
         }
-        > * {
-            margin-right: 1.5rem;
-            @include fd-rtl() {
-                margin-left: 1.5rem;
-                margin-right: 0rem;
-            }
+        &--copy-right {
+            color: $fd-copy-right-font-color;
+            font-family: '72', '72full', Arial, Helvetica, sans-serif;
+            font-size: $fd-footer-font-size;
+            text-align: right;
+            display: inline;
+            width: 25%;
         }
-    }
-    &--copy-right {
-        color: $fd-copy-right-font-color;
-        font-family: '72', '72full', Arial, Helvetica, sans-serif;
-        font-size: $fd-footer-font-size;
-        text-align: right;
-        display: inline;
     }
 }
 
-@media (max-width: 64rem) {
+@media (min-width: 1024px) and (max-width: 1440px) {
     .fdp-footer {
         @include fd-reset();
+
+        &--container {
+            display: flex;
+            width: 100%;
+            padding-top: 0.75rem;
+        }
 
         width: 100%;
         background-color: #fefefe;
@@ -88,9 +101,8 @@ $fd-footer-font-size: var(--sapFontSize, 0.875rem);
             color: $fd-link-font-color;
             font-family: '72', '72full', Arial, Helvetica, sans-serif;
             font-size: 0.875rem;
-            display: inherit;
-            padding-top: 0.75rem;
-            width: 73%;
+            display: inline;
+            width: 75%;
             > div > * {
                 margin-right: 1.5rem;
                 @include fd-rtl() {
@@ -112,13 +124,19 @@ $fd-footer-font-size: var(--sapFontSize, 0.875rem);
             font-size: 0.875rem;
             text-align: right;
             display: inline;
+            width: 25%;
         }
     }
 }
 
-@media (max-width: 48rem) {
+@media (min-width: 768px) and (max-width: 1023px) {
     .fdp-footer {
         @include fd-reset();
+
+        &--container {
+            width: 100%;
+            padding-top: 0.75rem;
+        }
 
         width: 100%;
         background-color: #fefefe;
@@ -134,9 +152,8 @@ $fd-footer-font-size: var(--sapFontSize, 0.875rem);
             color: $fd-link-font-color;
             font-family: '72', '72full', Arial, Helvetica, sans-serif;
             font-size: 0.875rem;
-            display: inherit;
-            padding-top: 0.75rem;
-            width: 73%;
+            display: inline;
+            width: 75%;
             > div > * {
                 margin-right: 1.5rem;
                 @include fd-rtl() {
@@ -157,13 +174,19 @@ $fd-footer-font-size: var(--sapFontSize, 0.875rem);
             font-family: '72', '72full', Arial, Helvetica, sans-serif;
             font-size: 0.875rem;
             text-align: right;
-            display: flex;
+            display: inline;
+            width: 25%;
         }
     }
 }
-@media (max-width: 22.5rem) {
+@media (min-width: 360px) and (max-width: 767px) {
     .fdp-footer {
         @include fd-reset();
+
+        &--container {
+            width: 100%;
+            padding-top: 0.75rem;
+        }
 
         width: 100%;
         background-color: #fefefe;
@@ -179,30 +202,12 @@ $fd-footer-font-size: var(--sapFontSize, 0.875rem);
             color: $fd-link-font-color;
             font-family: '72', '72full', Arial, Helvetica, sans-serif;
             font-size: 0.875rem;
-            display: inherit;
-            padding-top: 0.75rem;
-            width: 73%;
-            > div > * {
-                margin-right: 1.5rem;
-                @include fd-rtl() {
-                    margin-left: 1.5rem;
-                    margin-right: 0rem;
-                }
-            }
-            > * {
-                margin-right: 1.5rem;
-                @include fd-rtl() {
-                    margin-left: 1.5rem;
-                    margin-right: 0rem;
-                }
-            }
+            display: inline;
         }
         &--copy-right {
             color: $fd-copy-right-font-color;
             font-family: '72', '72full', Arial, Helvetica, sans-serif;
             font-size: 0.875rem;
-            text-align: right;
-            display: flex;
         }
     }
 }

@@ -2,10 +2,12 @@
     <div class="fdp-footer--logo">
         <ng-content *ngTemplateOutlet="logo"></ng-content>
     </div>
-    <div class="fdp-footer--link">
-        <ng-content *ngTemplateOutlet="content"></ng-content>
-    </div>
-    <div class="fdp-footer--copy-right">
-        <ng-content *ngTemplateOutlet="copyright"></ng-content>
+    <div class="fdp-footer--container">
+        <div class="fdp-footer--link">
+            <ng-content *ngTemplateOutlet="content"></ng-content>
+        </div>
+        <div class="fdp-footer--copy-right">
+            <ng-content *ngTemplateOutlet="copyright"></ng-content>
+        </div>
     </div>
 </div>

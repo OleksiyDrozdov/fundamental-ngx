@@ -8,12 +8,12 @@ import { PlatformFooterModule } from './footer.module';
 @Component({
     selector: 'fdp-link-test',
     template: `
-        <fdp-footer [logo]="logo" [icons]="icons" [copyRight]="copyRight"></fdp-footer>
+        <fdp-footer [logo]="logo" [content]="content" [copyright]="copyright"></fdp-footer>
         <ng-template #logo>
             <img id="fd-logo-1" src="/assets/images/logo-sap.svg" alt="" />
         </ng-template>
 
-        <ng-template #icons>
+        <ng-template #content>
             <fdp-link id="fd-link-test-1" href="/" title="footer link Supported Browser">Supported Browser</fdp-link>
             <fdp-link id="fd-link-test-2" href="/" title="footer link Security Disclosure"
                 >Security Disclosure</fdp-link
@@ -23,7 +23,7 @@ import { PlatformFooterModule } from './footer.module';
             <fdp-link id="fd-link-test-5" href="/" title="footer link Participant Team">Participant Team</fdp-link>
         </ng-template>
 
-        <ng-template #copyRight>
+        <ng-template #copyright>
             <span>1996-2021 Ariba Inc. All Rights Reserved</span>
         </ng-template>
     `

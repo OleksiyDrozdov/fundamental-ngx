@@ -16,8 +16,4 @@ export class FooterComponent {
     /** copyright template accpets the generic html */
     @Input()
     copyright: TemplateRef<any>;
-
-    /** Whether should be displayed in mobile mode **/
-    @Input()
-    mobile = false;
 }
