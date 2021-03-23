@@ -143,6 +143,7 @@ export class MenuComponent extends BasePopoverClass implements MenuInterface, Af
             this._subscriptions.add(
                 this._contentDensityService.contentDensity.subscribe((density) => {
                     this.compact = density === 'compact';
+                    this._changeDetectorRef.detectChanges();
                 })
             );
         }

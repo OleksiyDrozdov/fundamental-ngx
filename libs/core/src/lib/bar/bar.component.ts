@@ -1,5 +1,5 @@
 import {
-    ChangeDetectionStrategy,
+    ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
     ElementRef,
     Input,
@@ -8,7 +8,8 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 import { applyCssClass, ContentDensityService, CssClassBuilder } from '../utils/public_api';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { startWith, takeUntil } from 'rxjs/operators';
 
 export type SizeType = '' | 's' | 'm_l' | 'xl';
 export type BarDesignType = 'header' | 'subheader' | 'header-with-subheader' | 'footer' | 'floating-footer';
@@ -59,15 +60,33 @@ export class BarComponent implements OnChanges, OnInit, CssClassBuilder, OnDestr
     private _subscriptions = new Subscription();
 
     /** @hidden */
-    constructor(private _elementRef: ElementRef, @Optional() private _contentDensityService: ContentDensityService) {}
+    private _onDestroy = new Subject<void>();
+
+    /** @hidden */
+    constructor(
+        private _elementRef: ElementRef,
+        @Optional() private _contentDensityService: ContentDensityService
+    ) {}
 
     /** @hidden */
     ngOnInit(): void {
         if (this.cozy === null && this._contentDensityService) {
+
+            // First Option
+            this.cozy = this._contentDensityService.contentDensity.getValue() === 'cozy';
             this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
                 this.cozy = density === 'cozy';
                 this.buildComponentCssClass();
             }));
+
+            // Second Option
+            // this._contentDensityService.contentDensity.pipe(
+            //     startWith(this._contentDensityService.contentDensity.getValue()),
+            //     takeUntil(this._onDestroy)
+            // ).subscribe(density => {
+            //     this.cozy = density === 'cozy';
+            //     this.buildComponentCssClass();
+            // });
         }
         this.buildComponentCssClass();
     }
@@ -75,6 +94,8 @@ export class BarComponent implements OnChanges, OnInit, CssClassBuilder, OnDestr
     /** @hidden */
     ngOnDestroy(): void {
         this._subscriptions.unsubscribe();
+        this._onDestroy.next();
+        this._onDestroy.complete();
     }
 
     /** @hidden */

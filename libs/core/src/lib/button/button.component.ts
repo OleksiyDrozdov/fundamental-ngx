@@ -4,14 +4,15 @@ import {
     Component,
     ElementRef,
     Input,
-    OnChanges,
+    OnChanges, OnDestroy,
     OnInit,
     Optional,
     ViewEncapsulation
 } from '@angular/core';
 import { applyCssClass, ContentDensityService, CssClassBuilder } from '../utils/public_api';
 import { BaseButton } from './base-button';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { startWith, takeUntil } from 'rxjs/operators';
 
 
 /**
@@ -37,10 +38,13 @@ import { Subscription } from 'rxjs';
         '[attr.disabled]': '_disabled || null'
     }
 })
-export class ButtonComponent extends BaseButton implements OnChanges, CssClassBuilder, OnInit {
+export class ButtonComponent extends BaseButton implements OnChanges, CssClassBuilder, OnInit, OnDestroy {
     /** The property allows user to pass additional css classes. */
     @Input()
     class = '';
+
+    /** @hidden */
+    private _onDestroy = new Subject<void>();
 
     /** @hidden */
     private _subscriptions = new Subscription();
@@ -64,12 +68,32 @@ export class ButtonComponent extends BaseButton implements OnChanges, CssClassBu
 
     public ngOnInit(): void {
         if (this.compact === undefined && this._contentDensityService) {
-            this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
-                this.compact = density === 'compact';
+
+
+            // First Option
+            // this.compact = this._contentDensityService.contentDensity.getValue() !== 'cozy';
+            // this._subscriptions.add(this._contentDensityService.contentDensity.subscribe(density => {
+            //     this.compact = density !== 'cozy';
+            //     this.buildComponentCssClass();
+            // }));
+
+            // Second Option
+            this._contentDensityService.contentDensity.pipe(
+                startWith(this._contentDensityService.contentDensity.getValue()),
+                takeUntil(this._onDestroy)
+            ).subscribe(density => {
+                this.compact = density !== 'cozy';
                 this.buildComponentCssClass();
-            }));
+            });
         }
         this.buildComponentCssClass();
+    }
+
+    /** @hidden */
+    ngOnDestroy(): void {
+        this._onDestroy.next();
+        this._onDestroy.complete();
+        this._subscriptions.unsubscribe();
     }
 
     @applyCssClass
