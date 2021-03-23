@@ -54,7 +54,7 @@ export class BarComponent implements OnChanges, OnInit, CssClassBuilder, OnDestr
 
     /** Whether to apply cozy mode to the Bar. */
     @Input()
-    cozy: boolean = null;
+    cozy: boolean;
 
     /** @hidden */
     private _subscriptions = new Subscription();
@@ -70,7 +70,7 @@ export class BarComponent implements OnChanges, OnInit, CssClassBuilder, OnDestr
 
     /** @hidden */
     ngOnInit(): void {
-        if (this.cozy === null && this._contentDensityService) {
+        if (this.cozy === undefined && this._contentDensityService) {
 
             // First Option
             this.cozy = this._contentDensityService.contentDensity.getValue() === 'cozy';
