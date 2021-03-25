@@ -22,14 +22,13 @@ describe('Form-message Test', function() {
         formMessagePage.open();
     },1);
 
-    describe('Check orientation', function() {
-        it('should check RTL and LTR orientation', () => {
-            formMessagePage.checkRtlSwitch();
-        });
-
     afterEach(() => {
         refreshPage();
     }, 1);
+
+    it('should check RTL and LTR orientation', () => {
+        formMessagePage.checkRtlSwitch();
+    });
 
     arrOfFields.forEach(input =>{
         it('have field without label', () => {
@@ -52,6 +51,5 @@ describe('Form-message Test', function() {
             expect(getValue(input.fieldSelector))
                 .toEqual(text + number + specialCharacters + longLine);
         });
-    });
     });
 });
