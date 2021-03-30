@@ -1,9 +1,22 @@
 import { IllustratedMessagePo } from '../pages/illustrated-message.po';
-import {click} from '../../driver/wdio';
+import {checkElementScreenshot, 
+    click, 
+    mouseHoverElement, 
+    saveElementScreenshot, 
+    isElementClickable, 
+    elementDisplayed,
+    pause,
+    doesItExist} from '../../driver/wdio';
 
 describe('Illistrated-message tests', function() {
     const illustratedMessagePage = new IllustratedMessagePo();
-    const {illustratedMessageButtons, buttonDialog, dialogPopup, popupCloseButtons} = illustratedMessagePage;
+    const {sceneFirstBtn, 
+        sceneSecondBtn, 
+        spotBtn, 
+        buttonDialog, 
+        dialogPopup,
+        closePopupButtonHeader,
+        closePopupButton} = illustratedMessagePage;
 
     beforeAll(()=>{
         illustratedMessagePage.open();                              
@@ -18,30 +31,66 @@ describe('Illistrated-message tests', function() {
         expect(illustratedMessagePage.compareWithBaseline()).toBeLessThan(1);
     });
 
-    for (let btn of illustratedMessageButtons) {
-        it('should check is button clickable', () => {
-            click(btn.selectorBtn);
-            const el = $(btn.selectorBtn);
-            const isClickable = el.isClickable();
-            expect(isClickable).toBeTruthy();
-        });
-    };
-        
-    it('should open dialog popup illustrated Message', () => {
-        click(buttonDialog);
-        browser.pause(100);
-        const el = $(dialogPopup);
-        const isDisplayed = el.isDisplayed();
-        expect(isDisplayed).toBeTruthy();
+    it('should check is button clickable', () => {
+        expect(isElementClickable(sceneFirstBtn)).toBeTruthy();
+        expect(isElementClickable(sceneSecondBtn)).toBeTruthy();
+        expect(isElementClickable(spotBtn)).toBeTruthy();
     });
 
-    for (let btn of popupCloseButtons) {
-        it('should close dialog popup illustrated Message', () => {
-            click(buttonDialog);
-            click(btn.selectorBtn);
-            const el = $(dialogPopup);
-            const isDisplayed = el.isDisplayed();
-            expect(isDisplayed).toBeFalsy();
+    it('should open dialog popup illustrated Message', () => {
+        click(buttonDialog);
+        pause(100);
+        expect(elementDisplayed(dialogPopup)).toBeTruthy();
+    });
+
+    it('should close dialog popup illustrated Message "closePopupButtonHeader"', () => {
+        click(closePopupButtonHeader);
+        expect(doesItExist(dialogPopup)).toBeFalsy();
+    });
+
+    it('should close dialog popup illustrated Message "closePopupButton"', () => {
+        click(buttonDialog);
+        click(closePopupButton);
+        expect(doesItExist(dialogPopup)).toBeFalsy();
+    });
+
+    describe('verify buttons hover and focus', function() {
+        it('should check button hover state', () => {
+            checkButtonHoverState(sceneFirstBtn, 'button','sceneFirstBtn');
         });
-    };
+
+        it('should check button focus state', () => {
+            checkButtonFocusState(sceneFirstBtn, 'button','sceneFirstBtn');
+        });
+
+        it('should check button hover state', () => {
+            checkButtonHoverState(sceneSecondBtn, 'button','sceneSecondBtn');
+        });
+
+        it('should check button focus state', () => {
+            checkButtonFocusState(sceneSecondBtn, 'button','sceneSecondBtn');
+        });
+
+        it('should check button hover state', () => {
+            checkButtonHoverState(spotBtn, 'button', 'spotBtn');
+        });
+
+        it('should check button focus state', () => {
+            checkButtonFocusState(spotBtn, 'button', 'spotBtn');
+        });
+    });
+
+    function checkButtonHoverState(selector: string, tag: string, btnName: string, index: number = 0): void {
+        mouseHoverElement(selector, index);
+        saveElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index);
+        expect(checkElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index))
+            .toBeLessThan(101, `${btnName} button hover state mismatch`);
+    }
+
+    function checkButtonFocusState(selector: string, tag: string, btnName: string, index: number = 0): void {
+        click(selector, index);
+        saveElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index);
+        expect(checkElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index))
+            .toBeLessThan(101, `${btnName} button focus state mismatch`);
+    }
 });
