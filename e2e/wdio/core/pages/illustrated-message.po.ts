@@ -1,16 +1,14 @@
 import { CoreBaseComponentPo } from './core-base-component.po';
-import { waitForElDisplayed, waitForPresent, getImageTagBrowserPlatform} from '../../driver/wdio';
+import { waitForElDisplayed, waitForPresent } from '../../driver/wdio';
 
 export class IllustratedMessagePo extends CoreBaseComponentPo {
     url = '/illustrated-message';
     root = '#page-content';
-    
-    sceneFirstBtn = '#fd-illustrated-message-0 .fd-button:first-child';
-    sceneSecondBtn = '#fd-illustrated-message-0 .fd-button+button';
-    spotBtn = '#fd-card-id-0 .fd-button';
+
+    sceneAndSpotButtons = 'fd-illustrated-message-actions button';
     buttonDialog = '#background-ex1 .fd-button';
     dialogPopup = '[role="dialog"]';
-    closePopupButtonHeader = '.fd-dialog__header .fd-button';
+    closePopupSignButton = '.fd-dialog__header .fd-button';
     closePopupButton = '.fd-dialog__footer [label="Close"]>button';
 
     open(): void {
@@ -22,7 +20,6 @@ export class IllustratedMessagePo extends CoreBaseComponentPo {
     getScreenshotFolder(): object {
         return super.getScreenshotFolder(this.url);
     }
-
     saveExampleBaselineScreenshot(specName: string = 'illustrated-message'): void {
         super.saveExampleBaselineScreenshot(specName, this.getScreenshotFolder());
     }
