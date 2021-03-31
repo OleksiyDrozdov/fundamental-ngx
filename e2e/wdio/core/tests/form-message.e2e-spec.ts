@@ -20,7 +20,7 @@ describe('Form-message Test', function() {
     
     beforeAll(()=>{
         formMessagePage.open();
-    },1);
+    }, 1);
 
     afterEach(() => {
         refreshPage();
