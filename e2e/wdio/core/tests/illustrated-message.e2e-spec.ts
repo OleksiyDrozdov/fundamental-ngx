@@ -8,7 +8,8 @@ import { checkElementScreenshot,
     doesItExist,
     addIsActiveClass,
     getElementArrayLength,
-    waitForElDisplayed } from '../../driver/wdio';
+    waitForElDisplayed, 
+    focusElement } from '../../driver/wdio';
 
 describe('Illistrated-message tests', function() {
     const illustratedMessagePage = new IllustratedMessagePo();
@@ -93,7 +94,7 @@ describe('Illistrated-message tests', function() {
     }
 
     function checkButtonFocusState(selector: string, tag: string, btnName: string, index: number = 0): void {
-        click(selector, index);
+        focusElement(selector, index);
         saveElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} focus state mismatch`);

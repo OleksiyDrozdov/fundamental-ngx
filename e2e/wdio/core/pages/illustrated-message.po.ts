@@ -20,6 +20,7 @@ export class IllustratedMessagePo extends CoreBaseComponentPo {
     getScreenshotFolder(): object {
         return super.getScreenshotFolder(this.url);
     }
+    
     saveExampleBaselineScreenshot(specName: string = 'illustrated-message'): void {
         super.saveExampleBaselineScreenshot(specName, this.getScreenshotFolder());
     }
