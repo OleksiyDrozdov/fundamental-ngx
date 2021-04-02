@@ -5,18 +5,21 @@ export class FormMessagePo extends CoreBaseComponentPo {
     url = '/form-message';
     root = '#page-content';
 
-    autocompleteInputLabel = 'fdp-platform-input-auto-complete-validation-example label';
-
-    arrOfFields = [
-        {fieldSelector: '#input-message'},
-        {fieldSelector: '#background-ex0 div:nth-child(2) input'},
-        {fieldSelector: '#background-ex0 div:nth-child(3) input'},
-        {fieldSelector: '#textarea-message'}
-    ];
+    inputMessageField = '#input-message';
+    toggleMessageButton = 'fd-popover-control button';
+    inputGroupHover = '#group-message input';
+    textAreaMessage = '#textarea-message';
+    formMessageInputs = 'fd-popover-control input';
+    areaContainer = '.docs-tile-content-example';
+    formMessageButtons = '.fd-doc-component .fd-button';
 
     open(): void {
         super.open(this.url);
         waitForElDisplayed(this.root);
         waitForPresent(this.title);
+    }
+
+    getScreenshotFolder(): object {
+        return super.getScreenshotFolder(this.url);
     }
 }
