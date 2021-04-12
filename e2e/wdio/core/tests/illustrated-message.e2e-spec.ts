@@ -24,24 +24,10 @@ describe('Illistrated-message tests', function() {
     }, 1);
 
     describe('verify buttons hover, focus and active state', function() {
-        it('should check back button hover state', () => {
+        it('should check button state', () => {
             const buttonsArrLength = getElementArrayLength(sceneAndSpotButtons);
             for (let i = 0; buttonsArrLength > i; i++) {
-                checkButtonHoverState(sceneAndSpotButtons, 'HoverState'+ '-' + i, sceneAndSpotButtons, i);
-            }
-        });
-
-        it('should check back button focus state', () => {
-            const buttonsArrLength = getElementArrayLength(sceneAndSpotButtons);
-            for (let i = 0; buttonsArrLength > i; i++) {
-                checkButtonFocusState(sceneAndSpotButtons, 'FocusState'+ '-' + i, sceneAndSpotButtons, i);
-            }
-        });
-
-        it('should check back button active state', () => {
-            const buttonsArrLength = getElementArrayLength(sceneAndSpotButtons);
-            for (let i = 0; buttonsArrLength > i; i++) {
-                checkButtonActiveState(sceneAndSpotButtons, 'ActiveState'+ '-' + i, sceneAndSpotButtons, i);
+                checkElementStates(sceneAndSpotButtons, 'Butto'+ '-' + i, sceneAndSpotButtons, i);
             }
         });
     });
@@ -86,24 +72,30 @@ describe('Illistrated-message tests', function() {
         });
     });
 
-    function checkButtonHoverState(selector: string, tag: string, btnName: string, index: number = 0): void {
+    function checkElementHoverState(selector: string, tag: string, btnName: string, index: number = 0): void {
         mouseHoverElement(selector, index);
         saveElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} hover state mismatch`);
     }
 
-    function checkButtonFocusState(selector: string, tag: string, btnName: string, index: number = 0): void {
+    function checkElementFocusState(selector: string, tag: string, btnName: string, index: number = 0): void {
         focusElement(selector, index);
         saveElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} focus state mismatch`);
     }
 
-    function checkButtonActiveState(selector: string, tag: string, btnName: string, index: number = 0): void {
+    function checkElementActiveState(selector: string, tag: string, btnName: string, index: number = 0): void {
         addIsActiveClass(selector, index);
         saveElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, illustratedMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} active state mismatch`);
+    }
+
+    function checkElementStates(selector: string, tag: string, elementName: string, index: number = 0): void {
+        checkElementHoverState(selector, tag + 'hover-state-', elementName, index);
+        checkElementFocusState(selector, tag + 'focus-state-', elementName, index);
+        checkElementActiveState(selector, tag + 'active-state-', elementName, index);
     }
 });

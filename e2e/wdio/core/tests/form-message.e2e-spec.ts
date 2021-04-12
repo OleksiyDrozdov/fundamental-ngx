@@ -40,28 +40,27 @@ describe('Form-message Test', function() {
         formMessagePage.checkRtlSwitch();
     });
 
-    it('should check visual regression for "Input" when you click in input', () => {
+    it('should check tooltip visual regression for "Message With Input" when you click in input', () => {
         click(inputMessageField);
         checkState(areaContainer, 'exampleAreaContainersArr');
     });
 
-    it('should check visual regression for "InputGroup - Changed Programmatically" when you click button', () => {
+    it('should check tooltip visual regression for "Message With InputGroup - Changed Programmatically" when you click button', () => {
         click(toggleMessageButton);
         checkState(areaContainer, 'toggleMessageButton');
     });
 
-    it('should check visual regression for "InputGroup - Hover" when you hover input', () => {
+    it('should check tooltip visual regression for "Message With InputGroup - Hover" when you hover input', () => {
         scrollIntoView(areaContainer);
         mouseHoverElement(inputGroupHover);
         checkState(areaContainer, 'inputGroupHover');
     });
 
-    it('should check visual regression for "Textarea - Try to focus" when you focus in textarea', () => {
+    it('should check tooltip visual regression for "Message With Textarea" when you click in textarea', () => {
         scrollIntoView(areaContainer);
-        focusElement(textAreaMessage);
+        click(textAreaMessage);
         checkState(areaContainer, 'textAreaMessage');
     });
-
 
     it('should by default accept all kinds of input values – alphabet, numerical, special characters', () => {
         const buttonsArrLength = getElementArrayLength(formMessageInputs);
@@ -77,24 +76,10 @@ describe('Form-message Test', function() {
     });
 
     describe('verify buttons hover, focus and active state', function() {
-        it('should check back button hover state', () => {
+        it('should check button state', () => {
             const buttonsArrLength = getElementArrayLength(formMessageButtons);
             for (let i = 0; buttonsArrLength > i; i++) {
-                checkButtonHoverState(formMessageButtons, 'HoverState'+ '-' + i, formMessageButtons, i);
-            }
-        });
-
-        it('should check back button focus state', () => {
-            const buttonsArrLength = getElementArrayLength(formMessageButtons);
-            for (let i = 0; buttonsArrLength > i; i++) {
-                checkButtonFocusState(formMessageButtons, 'FocusState'+ '-' + i, formMessageButtons, i);
-            }
-        });
-        
-        it('should check back button active state', () => {
-            const buttonsArrLength = getElementArrayLength(formMessageButtons);
-            for (let i = 0; buttonsArrLength > i; i++) {
-                checkButtonActiveState(formMessageButtons, 'ActiveState'+ '-' + i, formMessageButtons, i);
+                checkElementStates(formMessageButtons, 'Button'+ '-' + i, formMessageButtons, i);
             }
         });
     });
@@ -106,24 +91,30 @@ describe('Form-message Test', function() {
         refreshPage();
     }
 
-    function checkButtonHoverState(selector: string, tag: string, btnName: string, index: number = 0): void {
+    function checkElementHoverState(selector: string, tag: string, btnName: string, index: number = 0): void {
         mouseHoverElement(selector, index);
         saveElementScreenshot(selector, tag, formMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, formMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} hover state mismatch`);
     }
 
-    function checkButtonFocusState(selector: string, tag: string, btnName: string, index: number = 0): void {
+    function checkElementFocusState(selector: string, tag: string, btnName: string, index: number = 0): void {
         focusElement(selector, index);
         saveElementScreenshot(selector, tag, formMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, formMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} focus state mismatch`);
     }
 
-    function checkButtonActiveState(selector: string, tag: string, btnName: string, index: number = 0): void {
+    function checkElementActiveState(selector: string, tag: string, btnName: string, index: number = 0): void {
         addIsActiveClass(selector, index);
         saveElementScreenshot(selector, tag, formMessagePage.getScreenshotFolder(), index);
         expect(checkElementScreenshot(selector, tag, formMessagePage.getScreenshotFolder(), index))
             .toBeLessThan(2, `${btnName} button item ${index} active state mismatch`);
+    }
+
+    function checkElementStates(selector: string, tag: string, elementName: string, index: number = 0): void {
+        checkElementHoverState(selector, tag + 'hover-state-', elementName, index);
+        checkElementFocusState(selector, tag + 'focus-state-', elementName, index);
+        checkElementActiveState(selector, tag + 'active-state-', elementName, index);
     }
 });
