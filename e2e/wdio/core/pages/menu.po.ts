@@ -5,8 +5,16 @@ export class MenuPo extends CoreBaseComponentPo {
     url = '/menu';
     root = '#page-content';
     menuButtonsArr = '.docs-tile__content .fd-button.fd-button--standard';
-    menuItemsArr = '.fd-menu__item';
+    bgColorCss = 'rgb(255,255,255)';
+    outlineCss = 'dotted';
+    icons = ".fd-menu__item fd-icon";
+    submenuActivePath = 'fd-menu-with-submenu-example>div span';
+    btnMenuWithIcons = 'button[label = "Menu with icons"]';
+    btnWithSubmenu = 'fd-menu-with-submenu-example>button';
     btnMobileMenu = 'fd-menu-mobile-example button';
+    menuItems = '.fd-menu__item';
+    menuItemsArr = '.fd-menu__item>a';
+    submenuItems = 'div.fd-menu__link span';
     dialogMobileMenu = 'div[role="dialog"]';
     closeDialogMobileMenu = 'fd-bar-element button';
     dialogMenuItemsArr = 'fd-dialog-body li';
