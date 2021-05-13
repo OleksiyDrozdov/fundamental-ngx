@@ -10,13 +10,12 @@ import { click,
     getCSSPropertyByName,
     getText,
     getTextArr,
-    refreshPage} from '../../driver/wdio';
+    refreshPage } from '../../driver/wdio';
 
 describe('Menu tests', function() {
     const menuPage = new MenuPo();
     const { menuButtonsArr,
-        bgColorCss,
-        outlineCss,
+        dialogMenuTitle,
         icons,
         submenuActivePath,
         btnMenuWithIcons, 
@@ -76,11 +75,11 @@ describe('Menu tests', function() {
                 click(menuButtonsArr, i);
                 const menuItemsArrLength = getElementArrayLength(menuItemsArr);
                 for (let j = 0; j < menuItemsArrLength; j++) {
-                    checkItemsWithKey(menuItemsArr, 'ArrowDown', 'outline-style', outlineCss, j);
+                    checkItemsWithKey(menuItemsArr, 'ArrowDown', 'outline-style', 'dotted', j);
                 }
 
                 for (let g = menuItemsArrLength-1; g > -1; g--) {
-                    checkItemsWithKey(menuItemsArr, 'ArrowUp', 'outline-style', outlineCss, g);
+                    checkItemsWithKey(menuItemsArr, 'ArrowUp', 'outline-style', 'dotted', g);
                 }
             }
         }); 
@@ -90,7 +89,7 @@ describe('Menu tests', function() {
                 click(menuButtonsArr, i);
                 const menuItemsArrLength = getElementArrayLength(menuItemsArr);
                 for (let j = 0; j < menuItemsArrLength; j++) {
-                    checkItemsWithKey(menuItemsArr, 'Tab', 'outline-style', outlineCss, j);
+                    checkItemsWithKey(menuItemsArr, 'Tab', 'outline-style', 'dotted', j);
                 }
             }
         });
@@ -113,9 +112,9 @@ describe('Menu tests', function() {
         it('should open and close dialog popup Mobile Menu', () => {
             click(btnMobileMenu);
             waitForElDisplayed(dialogMobileMenu);
-            expect(elementDisplayed(dialogMobileMenu)).toBeTruthy();
+            expect(elementDisplayed(dialogMobileMenu)).toBe(true);
             click(closeDialogMobileMenu);
-            expect(doesItExist(dialogMobileMenu)).toBeFalse();                                        
+            expect(doesItExist(dialogMobileMenu)).toBe(false);                                        
         });
 
         it('should check cascading menu for all dialog popup buttons', () => {
@@ -137,16 +136,13 @@ describe('Menu tests', function() {
 
     function checkDialogCascadingMenu(selector: string, btnSelector: string, btnBackSelector: string, previousLength: number): void {
         for (let i = 0; i < previousLength; i++) {
+            const btnTxt = getText(selector, i);
             click(btnSelector, i);
             const length = getElementArrayLength(selector);
-            const currentLength = length;
-            for (let j = 0; j < length; j++) {
-                mouseHoverElement(selector, j);
-                const outlineValue = getCSSPropertyByName(selector, 'background-color', j).value;
-                expect(outlineValue).toBe(bgColorCss);
-            }
+            const title = getText(dialogMenuTitle);
+            expect(btnTxt).toBe(title, `Pop up title doesn't match title of the selected element ${btnTxt}-${i}`);
             if (doesItExist(dialogMenuAddonArr)) {
-                checkDialogCascadingMenu(selector, btnSelector, btnBackSelector, currentLength);     
+                checkDialogCascadingMenu(selector, btnSelector, btnBackSelector, length);     
             }
             click(dialogBtnBack);
         }
