@@ -32,7 +32,7 @@ export class AvatarComponent implements OnChanges, OnInit, CssClassBuilder {
     @HostBinding('attr.id')
     id = `fd-avatar-${avatarUniqueId++}`;
 
-    /** Aria-label for Avatar.*/
+    /** Aria-label for Avatar. */
     @Input()
     @HostBinding('attr.aria-label')
     ariaLabel: string = null;
