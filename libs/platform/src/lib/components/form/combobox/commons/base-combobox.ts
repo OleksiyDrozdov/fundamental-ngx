@@ -31,7 +31,7 @@ import {
 } from '@angular/cdk/keycodes';
 
 import { fromEvent, isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil, tap } from 'rxjs/operators';
 
 import {
     DialogConfig,
@@ -40,7 +40,6 @@ import {
     ListComponent,
     MobileModeConfig,
     TemplateDirective,
-    FormStates,
     closestElement
 } from '@fundamental-ngx/core';
 import {
@@ -50,7 +49,8 @@ import {
     isOptionItem,
     MatchingBy,
     ObservableComboBoxDataSource,
-    OptionItem
+    OptionItem,
+    SelectableOptionItem
 } from '../../../../domain';
 
 import { isFunction, isJsObject, isString } from '../../../../utils/lang';
@@ -75,7 +75,10 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
     /** Provides maximum height for the optionPanel */
     @Input()
     maxHeight = '250px';
-
+    /** @hidden */
+    isListEmpty = true;
+    /** @hidden */
+    isSearchInvalid = false;
     /**
      *  The state of the form control - applies css classes.
      *  Can be 'success', 'error', 'warning', 'default', 'information'.
@@ -89,6 +92,9 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
         this._state = state;
     }
 
+    get isGroup(): boolean {
+                return !!(this.group && this.groupKey);
+             }
     /** Datasource for suggestion list */
     @Input()
     get dataSource(): FdpComboBoxDataSource<any> {
@@ -148,7 +154,7 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
 
     /** Horizontally align text inside the second column (Applicable for two columns layout) */
     @Input()
-    secondaryTextAlignment: TextAlignment = 'right';
+    secondaryTextAlignment: TextAlignment;
 
     /** Turns on/off Adjustable Width feature */
     @Input()
@@ -180,7 +186,7 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
     /** @hidden */
     @ContentChildren(TemplateDirective)
     customTemplates: QueryList<TemplateDirective>;
-
+    _flatSuggestions: SelectableOptionItem[];
     /** @hidden
      * Custom Option item Template
      * */
@@ -447,6 +453,7 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
      * Handle Keydown on Input
      * @hidden
      */
+    
     onInputKeydownHandler(event: KeyboardEvent): void {
         if (this.readonly) {
             return;
@@ -528,6 +535,12 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
         this._dataSource = this._openDataStream(ds);
     }
 
+    /** @hidden
+     *  Map grouped values to array. */
+    protected _flatGroups(items: SelectableOptionItem[]): SelectableOptionItem[] {
+        return items.reduce((result: SelectableOptionItem[], item: SelectableOptionItem) => result.concat(item.children), []);
+    }
+
     /** @hidden */
     private _openDataStream(ds: FdpComboBoxDataSource<any>): ComboBoxDataSource<any> {
         const initDataSource = this._toDataStream(ds);
@@ -542,9 +555,14 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
          */
         this._dsSubscription = initDataSource
             .open()
-            .pipe(takeUntil(this._destroyed))
+            .pipe(
+                takeUntil(this._destroyed),
+                tap(data => this.isListEmpty = !data?.length),
+                filter(data => !!data.length)
+            )
             .subscribe(data => {
                 this._suggestions = this._convertToOptionItems(data);
+                this._flatSuggestions = this.isGroup ? this._flatGroups(this._suggestions) : this._suggestions;
 
                 this.stateChanges.next('initDataSource.open().');
 
@@ -571,7 +589,6 @@ export abstract class BaseCombobox extends CollectionBaseInput implements AfterV
 
         return initDataSource;
     }
-
     /** @hidden */
     private _toDataStream(ds: FdpComboBoxDataSource<any>): ComboBoxDataSource<any> | undefined {
         if (isDataSource(ds)) {
