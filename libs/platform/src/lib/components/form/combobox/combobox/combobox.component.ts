@@ -247,6 +247,10 @@ export class ComboboxComponent extends BaseCombobox implements OnInit, AfterView
     }
     /** @hidden */
     private _getSelectedOptionItem(text: string): OptionItem | undefined {
+        if (!this.isGroup) {
+            return this._suggestions.find(item => item.label === text);
+        }
+
         return this._suggestions
             .reduce((result: OptionItem[], item: OptionItem) => {
                 result.push(...item.children);
